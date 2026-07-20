@@ -378,15 +378,11 @@ diff = (player - computer + <span class="num">3</span>) % <span class="num">3</s
           <strong>한도가 얼마인가?</strong>(<span class="mono">-Xmx</span>·limit) →
           <strong>누가 죽였나?</strong>(exit 137) 순으로 본다.</p></div>
       </div>
-      <p style="margin-top:14px; font-size:14px"><strong>실전 예</strong> — VS Code 창이
-        <span class="mono">reason: 'oom', code: 536870904</span> 로 죽는 유명 사례: PC 램이 바닥난 게 아니라
-        <strong>그 창(렌더러 프로세스)</strong>의 한도·누수 문제. 그래서 해결책도 램 증설이 아니라
-        <strong>확장 비활성화 · 캐시 삭제 · 한도 조정</strong>이다.</p>
-      <p style="margin-top:10px; font-size:14px"><strong>OOM ≠ nullptr 크래시.</strong>
-        OOM은 <strong>할당 실패</strong>(밖에서 죽임 — exit <span class="mono">137</span>),
-        nullptr 참조는 <strong>접근 위반</strong>(SIGSEGV — exit <span class="mono">139</span>).
-        단, C의 <span class="mono">malloc</span>은 부족하면 <span class="mono">NULL</span>을 돌려주므로 —
-        검사 없이 쓰면 <strong>OOM이 nullptr 크래시로 위장</strong>되어 나타난다.</p>
+      <p style="margin-top:14px; font-size:14px"><strong>실전 예</strong> — VS Code 창의
+        <span class="mono">reason: 'oom'</span> 크래시: 램 부족이 아니라 <strong>그 창(렌더러)의 한도·누수</strong> 문제라,
+        해결책도 램 증설이 아닌 확장 비활성화·캐시 삭제·한도 조정. 그리고 <strong>OOM(할당 실패, exit
+        <span class="mono">137</span>) ≠ nullptr 크래시(접근 위반, exit <span class="mono">139</span>)</strong> —
+        단 <span class="mono">malloc</span>은 부족하면 NULL을 주므로 <strong>OOM이 nullptr 크래시로 위장</strong>되곤 한다.</p>
     </div>
   </section>
 
@@ -754,10 +750,9 @@ s1.__dict__   <span class="com"># {'age': 20, 'gpa': 3.8}</span>
           </div>
         </div>
       </div>
-      <ul class="clean" style="margin-top:14px">
-        <li>C++는 멤버가 <strong>고정 배치</strong>(컴파일 때 확정), Python은 <strong>실행 중 <span class="mono">__dict__</span>에 추가</strong> — 그래서 선언 없이 대입만으로 된다.</li>
-        <li><span class="mono">__init__</span> = C++의 <strong>멤버 선언 + 생성자를 한 곳에서</strong>. <span class="mono">self</span> = 지금 만들어지는 그 인스턴스(숨은 <span class="mono">this</span>를 명시).</li>
-        <li>이 repo의 <span class="mono">RockPaperScissors.__init__</span>의 <span class="mono">self._rng</span>도 같은 원리다.</li>
+      <ul class="clean" style="margin-top:12px">
+        <li>C++는 컴파일 때 <strong>고정 배치</strong>, Python은 실행 중 <span class="mono">__dict__</span>에 추가 — 선언 없이 대입만으로 되는 이유.</li>
+        <li><span class="mono">__init__</span> = 멤버 선언+생성자를 한 곳에. <span class="mono">self</span> = 그 인스턴스(명시된 <span class="mono">this</span>). 이 repo의 <span class="mono">self._rng</span>도 같은 원리.</li>
       </ul>
     </div>
   </section>
@@ -1183,6 +1178,8 @@ _game = RockPaperScissors()
           </ul>
         </div>
       </div>
+      <p style="margin-top:18px; font-size:14.5px">여러분에게 가까운 예 — <strong>연구 코드가 서비스가 되는 순간</strong>:
+        노트북의 conda 환경이 컨테이너·쿠버네티스로 옮겨질 때, 위의 구조들(계층화·튜닝·타입)이 차례로 등장한다.</p>
     </div>
   </section>
 

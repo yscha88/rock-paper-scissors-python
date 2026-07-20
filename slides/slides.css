@@ -50,13 +50,13 @@ code,pre,.mono{font-family:var(--mono)}
 .deck{position:fixed; inset:0; overflow:hidden}
 .slide{
   position:absolute; inset:0; display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
+  align-items:center; overflow-y:auto;   /* 내용이 화면보다 크면 잘리지 않고 스크롤 */
   padding:clamp(20px,5vw,72px); opacity:0; visibility:hidden;
   transform:translateY(14px); transition:opacity .45s ease, transform .45s ease;
   pointer-events:none;
 }
 .slide.active{opacity:1; visibility:visible; transform:none; pointer-events:auto}
-.stage{width:100%; max-width:var(--maxw); margin:0 auto}
+.stage{width:100%; max-width:var(--maxw); margin:auto}  /* 공간이 남으면 세로 중앙, 넘치면 위부터 */
 @media (prefers-reduced-motion: reduce){
   .slide{transition:opacity .01s}
 }
