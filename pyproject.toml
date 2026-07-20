@@ -1,0 +1,34 @@
+# pyproject.toml — Python 의 표준 프로젝트 설정 파일 (PEP 518/621).
+# Java 의 build.gradle.kts, C++ 의 CMakeLists.txt 에 대응한다.
+# 빌드 도구(uv/pip/poetry)가 공통으로 이 파일을 읽는다.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rock-paper-scissors-python"
+version = "0.1.0"
+description = "교육용 가위바위보 — Java/C++ 대비 Python 의 간결함을 보여준다"
+readme = "README.md"
+requires-python = ">=3.11"
+# 핵심 로직 + CLI + 테스트는 서드파티 의존성이 0개다 (전부 표준 라이브러리).
+# Java 는 Spring/JUnit, C++ 는 GoogleTest 가 필요하지만 Python 은 표준 라이브러리로 충분하다.
+dependencies = []
+
+[project.optional-dependencies]
+# 웹 API(rps.web)를 쓸 때만 설치: pip install -e ".[web]"  또는  uv sync --extra web
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "gunicorn>=21.2"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+# 설치 후 `rps` 명령으로 CLI 실행 (Java 의 실행 가능 jar 에 해당).
+rps = "rps.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rps"]
+
+[tool.pytest.ini_options]
+# 설치 없이도 src 레이아웃을 import 할 수 있도록 경로를 추가한다.
+pythonpath = ["src"]
+testpaths = ["tests"]

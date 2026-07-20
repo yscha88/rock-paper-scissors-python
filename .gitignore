@@ -1,0 +1,30 @@
+# Python 바이트코드 / 캐시
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# 가상환경 (venv/uv/poetry/conda 무엇으로 만들든)
+.venv/
+venv/
+env/
+
+# 빌드 산출물
+build/
+dist/
+*.whl
+
+# uv / poetry 락파일은 앱이면 커밋, 라이브러리면 무시하는 편.
+# 이 교육 repo 는 앱에 가까우므로 락파일을 커밋하려면 아래 줄을 지운다.
+uv.lock
+poetry.lock
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Claude Code 로컬 권한 설정 (기기별)
+.claude/settings.local.json
