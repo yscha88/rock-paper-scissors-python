@@ -17,6 +17,7 @@
   <button data-goto="#sec02">02 환경</button>
   <button data-goto="#sec03">03 문법</button>
   <button data-goto="#sec04">04 비교</button>
+  <button data-goto="#secdbg">디버깅</button>
   <button data-goto="#seclabs">실습</button>
   <button data-goto="#secend">끝</button>
 </nav>
@@ -26,7 +27,7 @@
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
 </div>
-<div class="hint">이동: <span class="kbd">←</span> <span class="kbd">→</span> <span class="kbd">Space</span> · 챕터: <span class="kbd">1</span>~<span class="kbd">7</span></div>
+<div class="hint">이동: <span class="kbd">←</span> <span class="kbd">→</span> <span class="kbd">Space</span> · 챕터: <span class="kbd">1</span>~<span class="kbd">8</span></div>
 
 <main class="deck" id="deck">
 
@@ -350,129 +351,8 @@ diff = (player - computer + <span class="num">3</span>) % <span class="num">3</s
           낭비가 쌓이며</strong>, 회수가 돌 때 <strong>일시 멈춤(pause)</strong>도 생긴다.</li>
         <li><strong>GC가 있어도 관리는 남는다</strong> — 규모가 커지면 GC 선택(JDK별 Parallel→G1→ZGC)·힙 튜닝·참조 수명 관리로
           대상이 바뀔 뿐. <strong>JVM도 누수 난다</strong>(static 컬렉션·ThreadLocal·힙 밖 네이티브 버퍼).</li>
-        <li>이 낭비가 한계에 닿은 극단이 다음 장의 <strong>OOM</strong>이다.</li>
+        <li>이 낭비가 한계에 닿은 극단이 <strong>OOM</strong> — 이론을 마친 뒤 <strong>디버깅 장</strong>에서 실전으로 다룬다.</li>
       </ul>
-    </div>
-  </section>
-
-  <!-- 01 · OOM -->
-  <section class="slide">
-    <div class="stage">
-      <div class="eyebrow"><span class="tick"></span>01 · 메모리와 OOM</div>
-      <h2><span class="mono">OOM</span> — "메모리 부족"이 전부가 아니다</h2>
-      <p class="lead" style="margin-top:10px">이름부터 함정이다 — <strong>"Out of Memory"라고 해서 램이
-        정말 모자랐다는 뜻이 아니다.</strong> 메시지만으로는 알 수 없고, 실제 현장의 OOM은 대부분 다른 이유다.</p>
-      <div class="grid g2">
-        <div class="card scissors"><div class="k">① 누수 — "못" 치우는 것</div>
-          <p>참조를 계속 쥐고 있으면 GC는 "아직 쓰는 중"으로 판단해 <strong>치울 수 없다</strong>
-          (쌓기만 하는 전역 캐시가 전형). 메모리가 부족해서가 아니라 <strong>회수가 불가능</strong>해서 죽는다.</p></div>
-        <div class="card rock"><div class="k">② 한도(limit) 도달</div>
-          <p>JVM <span class="mono">-Xmx</span>, 컨테이너(cgroup) memory limit — <strong>서버 램이 남아돌아도</strong>
-          설정한 상한을 넘으면 OOM. "램은 널널한데 왜 죽지?"의 정체.</p></div>
-        <div class="card paper"><div class="k">③ OOM Killer — 죽임 "당하는" 것</div>
-          <p>리눅스 커널이 메모리가 몰리면 <strong>프로세스를 골라 강제 종료</strong>한다.
-          쿠버네티스의 <span class="mono">OOMKilled</span>(exit 137)가 이것 — 앱 내부 오류가 아니라
-          <strong>바깥에서 죽인 것</strong>.</p></div>
-        <div class="card"><div class="k" style="--chip:var(--ink)">진단 순서</div>
-          <p>OOM을 보면 "램 늘리기" 전에 — <strong>무엇이 안 치워지나?</strong>(누수) →
-          <strong>한도가 얼마인가?</strong>(<span class="mono">-Xmx</span>·limit) →
-          <strong>누가 죽였나?</strong>(exit 137) 순으로 본다.</p></div>
-      </div>
-      <p style="margin-top:14px; font-size:14px"><strong>실전 예</strong> — VS Code 창의
-        <span class="mono">reason: 'oom'</span> 크래시: 램 부족이 아니라 <strong>그 창(렌더러)의 한도·누수</strong> 문제라,
-        해결책도 램 증설이 아닌 확장 비활성화·캐시 삭제·한도 조정. 그리고 <strong>OOM(할당 실패, exit
-        <span class="mono">137</span>) ≠ nullptr 크래시(접근 위반, exit <span class="mono">139</span>)</strong> —
-        단 <span class="mono">malloc</span>은 부족하면 NULL을 주므로 <strong>OOM이 nullptr 크래시로 위장</strong>되곤 한다.</p>
-    </div>
-  </section>
-
-  <!-- 01 · 에러 라벨의 정체 -->
-  <section class="slide">
-    <div class="stage">
-      <div class="eyebrow"><span class="tick"></span>01 · 에러 메시지의 정체</div>
-      <h2>같은 에러에 해결책이 <span class="accent">수십 개</span>인 이유</h2>
-      <p class="lead" style="margin-top:10px">VS Code의 <span class="mono">'oom'</span> 크래시는 확장 누수·대용량 파일,
-        심지어 <strong>코딩 폰트+합자</strong>(CommitMono·PragmataPro Liga — #239541 확인) 조합으로도 난다.
-        왜 전부 "oom" 한 단어일까?</p>
-      <div class="two-col">
-        <div>
-          <div class="col-label"><span class="tag" style="background:var(--scissors)"></span>에러명은 "사인(死因)"이지 "범인"이 아니다</div>
-          <ul class="clean">
-            <li>수많은 원인(누수·폭주 루프·폰트 렌더링 버그)이 전부 <strong>"메모리 고갈"이라는 같은 종착지</strong>로 흘러든다.</li>
-            <li>부모 프로세스는 죽은 자식의 <strong>exit code만</strong> 보고 라벨을 붙인다 — 'oom'은 렌더러 종료 코드의 <strong>분류명</strong>일 뿐.</li>
-            <li>같은 메시지 아래 <strong>서로 다른 원인을 고친</strong> 해결책 수십 개가 모인다 — 공식 이슈(#226484)는
-              <strong>8가지를 시도하고도 원인 미상</strong>으로 닫혔다.</li>
-            <li><strong>라벨→범인 예측은 불가</strong>, 역추적만 가능: 재현 조건 격리 → A/B(폰트·합자 끄기) → 덤프 스택 → 프로파일.</li>
-            <li><strong>실측</strong> — 라벨은 'oom'이어도 <strong>이벤트 뷰어</strong>엔 "WebView2 보안 정책 위반으로
-              강제 종료 → 재시작 반복"이 적혀 있기도 하다. 진짜 사인은 <strong>OS의 장부</strong>에 있다.</li>
-          </ul>
-        </div>
-        <div>
-          <div class="col-label"><span class="tag" style="background:var(--paper)"></span>예외 처리 계층이 라벨을 바꾼다</div>
-          <div class="editor">
-            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">같은 할당 실패, 다른 라벨</span></div>
-<pre><span class="com">// C++ — 처리 방식에 따라 다른 죽음으로 보인다</span>
-<span class="kw">new</span> T;           <span class="com">// bad_alloc 예외 → 안 잡으면 abort</span>
-<span class="kw">new</span>(nothrow) T;  <span class="com">// nullptr 반환 → 미검사면 segfault!</span>
-
-<span class="com">// Java — OOM Error를 catch로 삼키면?</span>
-<span class="kw">try</span> { ... } <span class="kw">catch</span> (OutOfMemoryError e) { }
-<span class="com">// → 반쯤 초기화된 채 살아남아</span>
-<span class="com">//   나중에 엉뚱한 NPE로 재등장</span></pre>
-          </div>
-          <p style="margin-top:10px; font-size:13.5px">라벨은 <strong>마지막으로 잡은 계층</strong>이 붙인다.
-            진짜 질문은 <strong>"이 라벨, 누가 붙였나?"</strong> — 그리고 "fixed"는 사슬 하나가 끊겼다는 뜻일 뿐,
-            <strong>같은 라벨은 다른 범인으로 재발한다.</strong></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 01 · 순서가 어긋나면 -->
-  <section class="slide">
-    <div class="stage">
-      <div class="eyebrow"><span class="tick"></span>01 · 실행 모델과 버그</div>
-      <h2>순서가 어긋나면 — <span class="mono">nullptr</span> · <span class="mono">undefined</span> · <span class="mono">NameError</span></h2>
-      <p class="lead" style="margin-top:10px">"정의(초기화)보다 사용이 먼저" — 언어마다 증상 이름만 다른 <strong>한 가족의 버그</strong>.</p>
-      <div class="grid g3">
-        <div class="card scissors"><div class="k">C++ · 컴파일/링크 시점</div>
-          <p>파일 간 <strong>전역 객체 초기화 순서는 보장 안 됨</strong>(static initialization order fiasco)
-          → 초기화 전 참조 = <span class="mono">nullptr</span>·쓰레기 값 크래시. 링크 순서가 틀리면
-          <span class="mono">undefined reference</span>.</p></div>
-        <div class="card paper"><div class="k">Python · 실행 시점</div>
-          <p>위에서 아래로 실행하며 이름을 만듦 — 정의 전에 호출하면
-          <span class="mono">NameError</span>. 순환 import는 "반쯤 초기화된 모듈" →
-          <span class="mono">AttributeError</span>.</p></div>
-        <div class="card rock"><div class="k">JavaScript</div>
-          <p><span class="mono">var</span> 선언은 끌어올려지고(호이스팅) 값 대입은 제자리 —
-          그 사이에 읽으면 <span class="mono">undefined</span>.</p></div>
-      </div>
-      <p style="margin-top:18px; font-size:14.5px">세 증상의 뿌리는 하나 —
-        <strong>"이 이름(주소)이 쓰이는 시점에 준비돼 있는가?"</strong>
-        실행 모델을 알면 어느 단계(컴파일·링크·실행)에서 터졌는지로 원인을 좁힐 수 있다.</p>
-    </div>
-  </section>
-
-  <!-- 01 · CS 부족 디버깅 카탈로그 -->
-  <section class="slide">
-    <div class="stage">
-      <div class="eyebrow"><span class="tick"></span>01 · 왜 배우나</div>
-      <h2>CS를 모르면 잡을 수 없는 버그들</h2>
-      <p class="lead" style="margin-top:10px">레거시 세대가 "당연히 확인하던 것들"이 두꺼운 추상화에 가려 안 보이게 됐다 —
-        <strong>증상은 위층에서 보여도, 원인은 아래층에 있다.</strong></p>
-      <table class="tbl plain">
-        <thead><tr><th>증상</th><th>순진한 해석</th><th>진짜 원인 후보</th><th>필요한 아래층 지식</th></tr></thead>
-        <tbody>
-          <tr><td class="mono">OOM</td><td>"램 부족 → 늘리자"</td><td>누수 · 한도(<span class="mono">-Xmx</span>/limit) · 주소공간 · 단편화</td><td>메모리·GC</td></tr>
-          <tr><td class="mono">nullptr·NameError</td><td>"코드가 이상해요"</td><td>초기화·링크·실행 <b>순서</b></td><td>번역·실행 모델</td></tr>
-          <tr><td>한글이 <span class="mono">???</span></td><td>"폰트 문제?"</td><td><b>인코딩</b>(코드페이지 vs UTF-8)</td><td>문자 표현</td></tr>
-          <tr><td class="mono">0.1+0.2 ≠ 0.3</td><td>"언어 버그?"</td><td>부동소수점 <b>이진 표현</b></td><td>수 표현</td></tr>
-          <tr><td>"어제는 됐는데"</td><td>"컴퓨터 탓"</td><td>의존성 <b>버전 범위</b>가 새 버전을 당김</td><td>고정 vs 범위 (02장)</td></tr>
-          <tr><td>"느려요"</td><td>"서버 늘리자"</td><td>GIL · GC pause · O(n²)</td><td>실행 모델·자료구조</td></tr>
-        </tbody>
-      </table>
-      <p style="margin-top:14px; font-size:14px">도구가 좋아질수록 이 격차는 <strong>더 벌어진다</strong> —
-        AI가 코드를 쓰는 시대일수록, <strong>아래층을 읽는 능력이 곧 디버깅 능력</strong>이다.</p>
     </div>
   </section>
 
@@ -1270,6 +1150,127 @@ _game = RockPaperScissors()
   </section>
 
   <!-- ══════════ 실습 · Labs ══════════ -->
+
+  <!-- 디버깅 · OOM -->
+  <section class="slide" id="secdbg">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>디버깅 · OOM의 정체</div>
+      <h2><span class="mono">OOM</span> — "메모리 부족"이 전부가 아니다</h2>
+      <p class="lead" style="margin-top:10px">이름부터 함정이다 — <strong>"Out of Memory"라고 해서 램이
+        정말 모자랐다는 뜻이 아니다.</strong> 메시지만으로는 알 수 없고, 실제 현장의 OOM은 대부분 다른 이유다.</p>
+      <div class="grid g2">
+        <div class="card scissors"><div class="k">① 누수 — "못" 치우는 것</div>
+          <p>참조를 계속 쥐고 있으면 GC는 "아직 쓰는 중"으로 판단해 <strong>치울 수 없다</strong>
+          (쌓기만 하는 전역 캐시가 전형). 메모리가 부족해서가 아니라 <strong>회수가 불가능</strong>해서 죽는다.</p></div>
+        <div class="card rock"><div class="k">② 한도(limit) 도달</div>
+          <p>JVM <span class="mono">-Xmx</span>, 컨테이너(cgroup) memory limit — <strong>서버 램이 남아돌아도</strong>
+          설정한 상한을 넘으면 OOM. "램은 널널한데 왜 죽지?"의 정체.</p></div>
+        <div class="card paper"><div class="k">③ OOM Killer — 죽임 "당하는" 것</div>
+          <p>리눅스 커널이 메모리가 몰리면 <strong>프로세스를 골라 강제 종료</strong>한다.
+          쿠버네티스의 <span class="mono">OOMKilled</span>(exit 137)가 이것 — 앱 내부 오류가 아니라
+          <strong>바깥에서 죽인 것</strong>.</p></div>
+        <div class="card"><div class="k" style="--chip:var(--ink)">진단 순서</div>
+          <p>OOM을 보면 "램 늘리기" 전에 — <strong>무엇이 안 치워지나?</strong>(누수) →
+          <strong>한도가 얼마인가?</strong>(<span class="mono">-Xmx</span>·limit) →
+          <strong>누가 죽였나?</strong>(exit 137) 순으로 본다.</p></div>
+      </div>
+      <p style="margin-top:14px; font-size:14px"><strong>실전 예</strong> — VS Code 창의
+        <span class="mono">reason: 'oom'</span> 크래시: 램 부족이 아니라 <strong>그 창(렌더러)의 한도·누수</strong> 문제라,
+        해결책도 램 증설이 아닌 확장 비활성화·캐시 삭제·한도 조정. 그리고 <strong>OOM(할당 실패, exit
+        <span class="mono">137</span>) ≠ nullptr 크래시(접근 위반, exit <span class="mono">139</span>)</strong> —
+        단 <span class="mono">malloc</span>은 부족하면 NULL을 주므로 <strong>OOM이 nullptr 크래시로 위장</strong>되곤 한다.</p>
+    </div>
+  </section>
+
+  <!-- 디버깅 · 에러 라벨 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>디버깅 · 에러 라벨</div>
+      <h2>같은 에러에 해결책이 <span class="accent">수십 개</span>인 이유</h2>
+      <p class="lead" style="margin-top:10px">VS Code의 <span class="mono">'oom'</span> 크래시는 확장 누수·대용량 파일,
+        심지어 <strong>코딩 폰트+합자</strong>(CommitMono·PragmataPro Liga — #239541 확인) 조합으로도 난다.
+        왜 전부 "oom" 한 단어일까?</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--scissors)"></span>에러명은 "사인(死因)"이지 "범인"이 아니다</div>
+          <ul class="clean">
+            <li>수많은 원인(누수·폭주 루프·폰트 렌더링 버그)이 전부 <strong>"메모리 고갈"이라는 같은 종착지</strong>로 흘러든다.</li>
+            <li>부모 프로세스는 죽은 자식의 <strong>exit code만</strong> 보고 라벨을 붙인다 — 'oom'은 렌더러 종료 코드의 <strong>분류명</strong>일 뿐.</li>
+            <li>같은 메시지 아래 <strong>서로 다른 원인을 고친</strong> 해결책 수십 개가 모인다 — 공식 이슈(#226484)는
+              <strong>8가지를 시도하고도 원인 미상</strong>으로 닫혔다.</li>
+            <li><strong>라벨→범인 예측은 불가</strong>, 역추적만 가능: 재현 조건 격리 → A/B(폰트·합자 끄기) → 덤프 스택 → 프로파일.</li>
+            <li><strong>실측</strong> — 라벨은 'oom'이어도 <strong>이벤트 뷰어</strong>엔 "WebView2 보안 정책 위반으로
+              강제 종료 → 재시작 반복"이 적혀 있기도 하다. 진짜 사인은 <strong>OS의 장부</strong>에 있다.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--paper)"></span>예외 처리 계층이 라벨을 바꾼다</div>
+          <div class="editor">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">같은 할당 실패, 다른 라벨</span></div>
+<pre><span class="com">// C++ — 처리 방식에 따라 다른 죽음으로 보인다</span>
+<span class="kw">new</span> T;           <span class="com">// bad_alloc 예외 → 안 잡으면 abort</span>
+<span class="kw">new</span>(nothrow) T;  <span class="com">// nullptr 반환 → 미검사면 segfault!</span>
+
+<span class="com">// Java — OOM Error를 catch로 삼키면?</span>
+<span class="kw">try</span> { ... } <span class="kw">catch</span> (OutOfMemoryError e) { }
+<span class="com">// → 반쯤 초기화된 채 살아남아</span>
+<span class="com">//   나중에 엉뚱한 NPE로 재등장</span></pre>
+          </div>
+          <p style="margin-top:10px; font-size:13.5px">라벨은 <strong>마지막으로 잡은 계층</strong>이 붙인다.
+            진짜 질문은 <strong>"이 라벨, 누가 붙였나?"</strong> — 그리고 "fixed"는 사슬 하나가 끊겼다는 뜻일 뿐,
+            <strong>같은 라벨은 다른 범인으로 재발한다.</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 디버깅 · 순서 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>디버깅 · 실행 순서</div>
+      <h2>순서가 어긋나면 — <span class="mono">nullptr</span> · <span class="mono">undefined</span> · <span class="mono">NameError</span></h2>
+      <p class="lead" style="margin-top:10px">"정의(초기화)보다 사용이 먼저" — 언어마다 증상 이름만 다른 <strong>한 가족의 버그</strong>.</p>
+      <div class="grid g3">
+        <div class="card scissors"><div class="k">C++ · 컴파일/링크 시점</div>
+          <p>파일 간 <strong>전역 객체 초기화 순서는 보장 안 됨</strong>(static initialization order fiasco)
+          → 초기화 전 참조 = <span class="mono">nullptr</span>·쓰레기 값 크래시. 링크 순서가 틀리면
+          <span class="mono">undefined reference</span>.</p></div>
+        <div class="card paper"><div class="k">Python · 실행 시점</div>
+          <p>위에서 아래로 실행하며 이름을 만듦 — 정의 전에 호출하면
+          <span class="mono">NameError</span>. 순환 import는 "반쯤 초기화된 모듈" →
+          <span class="mono">AttributeError</span>.</p></div>
+        <div class="card rock"><div class="k">JavaScript</div>
+          <p><span class="mono">var</span> 선언은 끌어올려지고(호이스팅) 값 대입은 제자리 —
+          그 사이에 읽으면 <span class="mono">undefined</span>.</p></div>
+      </div>
+      <p style="margin-top:18px; font-size:14.5px">세 증상의 뿌리는 하나 —
+        <strong>"이 이름(주소)이 쓰이는 시점에 준비돼 있는가?"</strong>
+        실행 모델을 알면 어느 단계(컴파일·링크·실행)에서 터졌는지로 원인을 좁힐 수 있다.</p>
+    </div>
+  </section>
+
+  <!-- 디버깅 · 카탈로그 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>디버깅 · 종합</div>
+      <h2>CS를 모르면 잡을 수 없는 버그들</h2>
+      <p class="lead" style="margin-top:10px">레거시 세대가 "당연히 확인하던 것들"이 두꺼운 추상화에 가려 안 보이게 됐다 —
+        <strong>증상은 위층에서 보여도, 원인은 아래층에 있다.</strong></p>
+      <table class="tbl plain">
+        <thead><tr><th>증상</th><th>순진한 해석</th><th>진짜 원인 후보</th><th>필요한 아래층 지식</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">OOM</td><td>"램 부족 → 늘리자"</td><td>누수 · 한도(<span class="mono">-Xmx</span>/limit) · 주소공간 · 단편화</td><td>메모리·GC</td></tr>
+          <tr><td class="mono">nullptr·NameError</td><td>"코드가 이상해요"</td><td>초기화·링크·실행 <b>순서</b></td><td>번역·실행 모델</td></tr>
+          <tr><td>한글이 <span class="mono">???</span></td><td>"폰트 문제?"</td><td><b>인코딩</b>(코드페이지 vs UTF-8)</td><td>문자 표현</td></tr>
+          <tr><td class="mono">0.1+0.2 ≠ 0.3</td><td>"언어 버그?"</td><td>부동소수점 <b>이진 표현</b></td><td>수 표현</td></tr>
+          <tr><td>"어제는 됐는데"</td><td>"컴퓨터 탓"</td><td>의존성 <b>버전 범위</b>가 새 버전을 당김</td><td>고정 vs 범위 (02장)</td></tr>
+          <tr><td>"느려요"</td><td>"서버 늘리자"</td><td>GIL · GC pause · O(n²)</td><td>실행 모델·자료구조</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px; font-size:14px">도구가 좋아질수록 이 격차는 <strong>더 벌어진다</strong> —
+        AI가 코드를 쓰는 시대일수록, <strong>아래층을 읽는 능력이 곧 디버깅 능력</strong>이다.</p>
+    </div>
+  </section>
 
   <!-- 28 · Labs overview -->
   <section class="slide" id="seclabs">
