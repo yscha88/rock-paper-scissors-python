@@ -21,7 +21,7 @@
   <button data-goto="#secend">끝</button>
 </nav>
 <div class="dots" id="dots" aria-hidden="true"></div>
-<div class="chrome counter"><b id="cur">1</b> / <span id="total">52</span></div>
+<div class="chrome counter"><b id="cur">1</b> / <span id="total">53</span></div>
 <div class="chrome nav">
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
@@ -754,6 +754,47 @@ s1.__dict__   <span class="com"># {'age': 20, 'gpa': 3.8}</span>
         <li>C++는 컴파일 때 <strong>고정 배치</strong>, Python은 실행 중 <span class="mono">__dict__</span>에 추가 — 선언 없이 대입만으로 되는 이유.</li>
         <li><span class="mono">__init__</span> = 멤버 선언+생성자를 한 곳에. <span class="mono">self</span> = 그 인스턴스(명시된 <span class="mono">this</span>). 이 repo의 <span class="mono">self._rng</span>도 같은 원리.</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- 03 · 던더의 정체 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>03 · 클래스 심화</div>
+      <h2>던더 — 문법을 메서드로 <span class="accent">번역</span>하는 규약</h2>
+      <p class="lead" style="margin-top:8px">던더(dunder) = <strong>D</strong>ouble <strong>UNDER</strong>score의 준말("매직 메서드").
+        밑줄 두 개 = "내가 아니라 <strong>파이썬 문법이 부르는 자리</strong>"라는 격리 표시다.</p>
+      <div class="two-col" style="margin-top:12px">
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--paper)"></span>문법 → 실제로 불리는 던더</div>
+          <table class="tbl plain" style="margin-top:0; font-size:13px">
+            <tbody>
+              <tr><td class="mono">a == b</td><td class="mono">a.__eq__(b)</td></tr>
+              <tr><td class="mono">a - b</td><td class="mono">a.__sub__(b) <span style="color:var(--muted)">← Hand 뺄셈의 정체</span></td></tr>
+              <tr><td class="mono">len(x) · x[i]</td><td class="mono">__len__ · __getitem__</td></tr>
+              <tr><td class="mono">for v in x</td><td class="mono">x.__iter__()</td></tr>
+              <tr><td class="mono">print(x)</td><td class="mono">x.__str__()</td></tr>
+              <tr><td class="mono">with x:</td><td class="mono">__enter__ / __exit__</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:13.5px">던더를 정의하면 <strong>내 타입을 언어 문법에 끼워 넣는다</strong> —
+            dataclass가 <span class="mono">__eq__</span>를 만들어 주면 <span class="mono">==</span>가 그냥 동작하는 이유.</p>
+        </div>
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--rock)"></span>같은 문제, 세 언어의 해법</div>
+          <table class="tbl plain" style="margin-top:0; font-size:13px">
+            <thead><tr><th></th><th>Python</th><th>C++</th><th>Java</th></tr></thead>
+            <tbody>
+              <tr><td>방식</td><td><b>이름 규약</b> — 문법이 자동 호출</td><td><span class="mono">operator</span> 키워드</td><td>오버로딩 없음 — <b>직접 호출</b></td></tr>
+              <tr><td class="mono">==</td><td class="mono">__eq__</td><td class="mono">operator==</td><td>불가 — <span class="mono">equals()</span> 손수</td></tr>
+              <tr><td>출력</td><td class="mono">__str__</td><td class="mono">operator&lt;&lt;</td><td class="mono">toString()</td></tr>
+              <tr><td>정리 보장</td><td class="mono">__exit__</td><td>소멸자 <span class="mono">~T()</span> — RAII</td><td><span class="mono">close()</span> — AutoCloseable</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:13.5px">Java는 <span class="mono">==</span>가 참조 비교로 <strong>고정</strong>,
+            C++는 별도 선언 문법 필요 — Python은 <strong>이름만 맞추면 끝</strong>. "끼워 넣기" 비용이 가장 낮다.</p>
+        </div>
+      </div>
     </div>
   </section>
 
