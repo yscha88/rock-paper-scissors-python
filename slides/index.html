@@ -665,14 +665,16 @@ s1.__dict__   <span class="com"># {'age': 20, 'gpa': 3.8}</span>
           <table class="tbl plain" style="margin-top:0; font-size:13px">
             <thead><tr><th></th><th>Python</th><th>C++</th><th>Java</th></tr></thead>
             <tbody>
-              <tr><td>방식</td><td><b>이름 규약</b> — 문법이 자동 호출</td><td><span class="mono">operator</span> 키워드</td><td>오버로딩 없음 — <b>직접 호출</b></td></tr>
+              <tr><td>방식</td><td><b>이름 규약</b> — 문법이 자동 호출</td><td><span class="mono">operator</span> 키워드</td><td><b>연산자</b> 오버로딩 없음 — 직접 호출</td></tr>
               <tr><td class="mono">==</td><td class="mono">__eq__</td><td class="mono">operator==</td><td>불가 — <span class="mono">equals()</span> 손수</td></tr>
               <tr><td>출력</td><td class="mono">__str__</td><td class="mono">operator&lt;&lt;</td><td class="mono">toString()</td></tr>
               <tr><td>정리 보장</td><td class="mono">__exit__</td><td>소멸자 <span class="mono">~T()</span> — RAII</td><td><span class="mono">close()</span> — AutoCloseable</td></tr>
             </tbody>
           </table>
-          <p style="margin-top:10px; font-size:13.5px">Java는 <span class="mono">==</span>가 참조 비교로 <strong>고정</strong>,
-            C++는 별도 선언 문법 필요 — Python은 <strong>이름만 맞추면 끝</strong>. "끼워 넣기" 비용이 가장 낮다.</p>
+          <p style="margin-top:10px; font-size:13.5px"><strong>주의 — "오버로딩"은 두 갈래</strong>:
+            Java도 <strong>메서드</strong> 오버로딩(<span class="mono">println(int)/println(String)</span>)은 일상 —
+            없는 건 <strong>연산자</strong> 쪽. 반대로 Python은 연산자(던더)는 되지만 <strong>메서드 오버로딩이 없어</strong>
+            기본 인자·유니온(<span class="mono">Hand | str</span>)으로 대신한다 — 우리 <span class="mono">play()</span>가 그 사례.</p>
         </div>
       </div>
     </div>
