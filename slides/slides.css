@@ -249,6 +249,16 @@ ul.clean li strong{color:var(--ink)}
 .chapnav button:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset:1px}
 @media (max-width:900px){.chapnav{display:none}}
 
+/* ---------- 메모리 작업대 다이어그램 ---------- */
+.membar{display:flex; gap:5px; margin-top:18px}
+.membar .cell{flex:1; height:48px; border-radius:9px; border:1px solid var(--hair);
+  display:grid; place-items:center; font-family:var(--mono); font-size:12px; color:var(--muted)}
+.membar .used{background:color-mix(in srgb, var(--paper) 24%, transparent); color:var(--ink); font-weight:600}
+.membar .leak{background:color-mix(in srgb, var(--scissors) 26%, transparent); color:var(--scissors); font-weight:700;
+  border-color:color-mix(in srgb, var(--scissors) 50%, var(--hair))}
+.membar .free{background:var(--panel)}
+.membar-cap{margin-top:10px; font-size:13.5px; color:var(--muted); font-family:var(--mono)}
+
 /* ---------- 터미널 캐스트 (실측 출력 자동 재생) ---------- */
 pre.term{min-height:15.5em; cursor:pointer}
 .term .tl{display:block}

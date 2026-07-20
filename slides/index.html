@@ -22,7 +22,7 @@
   <button data-goto="#secend">끝</button>
 </nav>
 <div class="dots" id="dots" aria-hidden="true"></div>
-<div class="chrome counter"><b id="cur">1</b> / <span id="total">53</span></div>
+<div class="chrome counter"><b id="cur">1</b> / <span id="total">55</span></div>
 <div class="chrome nav">
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
@@ -336,30 +336,78 @@ diff = (player - computer + <span class="num">3</span>) % <span class="num">3</s
     </div>
   </section>
 
-  <!-- 9 · 메모리 관리 -->
+  <!-- 9a · 메모리 개념 -->
   <section class="slide">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>01 · CS 기초</div>
-      <h2>메모리 — 다 쓴 그릇은 누가 치우나</h2>
-      <p class="lead" style="margin-top:10px">메모리 = 값을 올려두는 <strong>작업대</strong>. 빌리고(할당) 반납(해제)해야 하며,
-        반납을 잊으면 <strong>누수</strong>.</p>
+      <h2>메모리 — 빌리고, 쓰고, 반납한다</h2>
+      <p class="lead" style="margin-top:10px">메모리(RAM) = 실행 중인 값을 올려두는 <strong>작업대</strong>.
+        모든 프로그램은 이 세 동작을 반복한다:</p>
+      <div class="flow" aria-label="메모리 생애주기">
+        <div class="flow-box">📥 빌린다<span>할당 — malloc / new / 객체 생성</span></div>
+        <div class="flow-arrow">──▶</div>
+        <div class="flow-box">✍️ 쓴다<span>값을 올려 두고 읽는다</span></div>
+        <div class="flow-arrow">──▶</div>
+        <div class="flow-box">📤 반납한다<span>해제 — free / GC 회수</span></div>
+      </div>
+      <div class="membar" aria-label="작업대 상태">
+        <div class="cell used">사용 중</div>
+        <div class="cell used">사용 중</div>
+        <div class="cell leak">누수!</div>
+        <div class="cell used">사용 중</div>
+        <div class="cell leak">누수!</div>
+        <div class="cell free"></div>
+        <div class="cell free"></div>
+        <div class="cell free"></div>
+      </div>
+      <p class="membar-cap">↑ 작업대. <b>반납을 잊은 칸(누수)</b>은 비어 보여도 아무도 못 쓴다 —
+        쌓이면 작업대가 가득 찬다(→ 디버깅 장의 OOM).</p>
+    </div>
+  </section>
+
+  <!-- 9b · 누가 치우나 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>01 · CS 기초</div>
+      <h2>설거지는 누가 — 부담은 <span class="accent">이동</span>할 뿐</h2>
       <table class="tbl plain">
         <thead><tr><th>언어</th><th>누가 치우나</th><th>개발자 부담</th><th>컴퓨터(런타임) 부담</th></tr></thead>
         <tbody>
-          <tr><td class="mono">C</td><td>직접 — <span class="mono">malloc</span>/<span class="mono">free</span></td><td><b>높음</b> — 누수·이중 해제 위험</td><td>낮음 — 정확히 관리하면 최소</td></tr>
+          <tr><td class="mono">C</td><td>직접 — <span class="mono">malloc</span>/<span class="mono">free</span></td><td><b>높음</b> — 누수·이중 해제 위험</td><td>낮음</td></tr>
           <tr><td class="mono">C++</td><td>범위 벗어나면 자동 — RAII·<span class="mono">unique_ptr</span></td><td>중간</td><td>낮음</td></tr>
-          <tr><td class="mono">Java</td><td><b>GC</b>(청소부)가 알아서 회수</td><td>낮음</td><td><b>높음</b> — GC 실행 비용 + 여유 메모리 필요</td></tr>
-          <tr><td class="mono">Python</td><td>참조 카운팅 + GC</td><td>낮음</td><td>중간 — 참조 카운팅은 즉시, 순환 참조만 GC</td></tr>
+          <tr><td class="mono">Java</td><td><b>GC</b>(청소부)가 알아서 회수</td><td>낮음</td><td><b>높음</b> — GC 비용 + 여유 메모리</td></tr>
+          <tr><td class="mono">Python</td><td>참조 카운팅 + GC</td><td>낮음</td><td>중간 — 즉시 회수, 순환만 GC</td></tr>
         </tbody>
       </table>
       <ul class="clean" style="margin-top:16px">
-        <li><strong>부담은 사라지지 않는다 — 이동할 뿐.</strong> GC는 "개발자의 설거지"를 "기계의 설거지"로 옮긴 것.</li>
-        <li>그래서 GC 언어는 같은 일에 <strong>메모리를 더 쓰는 경향</strong>이 있고, GC가 <strong>빨리 안 비워 주면
-          낭비가 쌓이며</strong>, 회수가 돌 때 <strong>일시 멈춤(pause)</strong>도 생긴다.</li>
-        <li><strong>GC가 있어도 관리는 남는다</strong> — 규모가 커지면 GC 선택(JDK별 Parallel→G1→ZGC)·힙 튜닝·참조 수명 관리로
-          대상이 바뀔 뿐. <strong>JVM도 누수 난다</strong>(static 컬렉션·ThreadLocal·힙 밖 네이티브 버퍼).</li>
-        <li>이 낭비가 한계에 닿은 극단이 <strong>OOM</strong> — 이론을 마친 뒤 <strong>디버깅 장</strong>에서 실전으로 다룬다.</li>
+        <li><strong>부담은 사라지지 않는다.</strong> GC는 "개발자의 설거지"를 <strong>"기계의 설거지"로 옮긴 것</strong> —
+          그래서 GC 언어는 같은 일에 메모리를 더 쓰는 경향이 있다.</li>
+        <li>GC가 <strong>빨리 안 비워 주면 낭비가 쌓이고</strong>, 회수가 돌 때 <strong>일시 멈춤(pause)</strong>이 생긴다.</li>
+        <li>C++판이 난수원을 <span class="mono">unique_ptr</span>로 소유하는 게 바로 "누가 언제 치우나"를 코드로 정하는 일.</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- 9c · GC가 있어도 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>01 · CS 기초</div>
+      <h2>GC가 있어도 "관리"는 사라지지 않는다</h2>
+      <p class="lead" style="margin-top:10px">규모가 커지면 관리 대상이 <strong>바뀔 뿐, 관리는 돌아온다</strong> —
+        GC는 "참조가 끊긴 것"만 회수하기 때문에 <strong>JVM에서도 누수는 난다</strong>:</p>
+      <div class="grid g2">
+        <div class="card scissors"><div class="k">살아 있는 참조 누수</div>
+          <p>static 컬렉션·무한 캐시·해제 안 한 리스너 — GC는 "아직 쓰는 중"으로 보고 <b>원리상 못 치운다</b>.</p></div>
+        <div class="card rock"><div class="k">ClassLoader / Metaspace</div>
+          <p>재배포를 반복하면 클래스가 안 내려가 Metaspace OOM — 레거시 WAS 단골.</p></div>
+        <div class="card paper"><div class="k">ThreadLocal</div>
+          <p>스레드풀에서 <span class="mono">remove()</span>를 안 하면 스레드가 사는 한 같이 산다.</p></div>
+        <div class="card"><div class="k" style="--chip:var(--ink)">네이티브 / DirectByteBuffer</div>
+          <p><b>힙 밖이라 GC 시야 밖</b> — <span class="mono">-Xmx</span>를 아무리 늘려도 안 잡힌다.</p></div>
+      </div>
+      <p style="margin-top:14px; font-size:14px">그래서 고급 과정엔 <strong>GC 선택</strong>(JDK 8 Parallel → 9+ G1 → ZGC)과
+        <strong>힙 튜닝</strong>(<span class="mono">-Xmx</span>·GC 로그·힙 덤프)이 등장한다 —
+        낭비가 한계에 닿은 극단이 <strong>OOM</strong>, 디버깅 장에서 실전으로.</p>
     </div>
   </section>
 
