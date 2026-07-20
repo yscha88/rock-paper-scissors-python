@@ -4,6 +4,7 @@
 Python 이 얼마나 짧고 간단하게 같은 일을 해내는지 눈으로 확인하는 **교육용 저장소**입니다.
 
 - 원본: [rock-paper-scissors](https://github.com/yscha88/rock-paper-scissors) — Java 17 + Spring Boot REST API (api · docker)
+  · 빌드된 Docker 이미지: [clmfkilu/rock-paper-scissors](https://hub.docker.com/r/clmfkilu/rock-paper-scissors) *(다음 강의에서 사용)*
 - 이식: [rock-paper-scissors-cpp](https://github.com/yscha88/rock-paper-scissors-cpp) — C++20 핵심 로직 + CLI
 - **이 repo**: [rock-paper-scissors-python](https://github.com/yscha88/rock-paper-scissors-python) —
   세 번째 이식판. 같은 도메인/판정 로직을 Python 으로, **"진짜 만들어 보기" 예제용**.

@@ -21,7 +21,7 @@
   <button data-goto="#secend">끝</button>
 </nav>
 <div class="dots" id="dots" aria-hidden="true"></div>
-<div class="chrome counter"><b id="cur">1</b> / <span id="total">44</span></div>
+<div class="chrome counter"><b id="cur">1</b> / <span id="total">51</span></div>
 <div class="chrome nav">
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
@@ -555,7 +555,7 @@ diff = (player - computer + <span class="num">3</span>) % <span class="num">3</s
         <div class="card"><div class="k" style="--chip:var(--paper)">venv · pip (②③)</div><p>표준 가상환경 + 설치. 가장 기본.</p></div>
         <div class="card"><div class="k" style="--chip:var(--paper)">uv ⭐ (①②③④)</div><p>버전·환경·설치·잠금을 초고속 통합. 권장.</p></div>
         <div class="card"><div class="k" style="--chip:var(--rock)">poetry (②③④)</div><p>의존성 관리 + 패키징·PyPI 배포.</p></div>
-        <div class="card"><div class="k" style="--chip:var(--rock)">conda (①②③)</div><p>파이썬 + <b>네이티브</b> 스택까지. 데이터/ML.</p></div>
+        <div class="card"><div class="k" style="--chip:var(--rock)">conda ⭐ (①②③)</div><p>파이썬 + <b>네이티브 스택</b>(CUDA·MKL)까지 — <b>AI/ML 연구실의 주력</b>.</p></div>
         <div class="card"><div class="k" style="--chip:var(--scissors)">gunicorn · uvicorn (⑤)</div><p>운영·개발 웹 서버. gunicorn은 리눅스용 → <b>WSL·Docker</b>로 배포.</p></div>
         <div class="card"><div class="k" style="--chip:var(--ink)">pyenv (①)</div><p>파이썬 버전 전환 (uv가 흡수 중).</p></div>
       </div>
@@ -1212,184 +1212,393 @@ _game = RockPaperScissors()
     </div>
   </section>
 
-  <!-- 29 · Lab 01 -->
+  <!-- 실습 01-A 개념 -->
   <section class="slide" id="lab01">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 01 · 바이너리 직접 실행</div>
-      <h2>zip 받아서, 설치 없이 실행</h2>
+      <h2>"설치"와 "직접 실행"은 다르다</h2>
+      <p class="lead" style="margin-top:10px">python.org 에서 <strong>zip 하나를 받아 압축만 풀고</strong>,
+        그 안의 <span class="mono">python.exe</span>로 가위바위보를 돌린다 — 인터프리터도 결국 폴더 안의 실행 파일임을 확인하는 실습.</p>
+      <table class="tbl plain">
+        <thead><tr><th></th><th>설치판 (installer)</th><th>embeddable (zip) ← 이 실습</th></tr></thead>
+        <tbody>
+          <tr><td>받는 것</td><td>설치 프로그램(.exe)</td><td><b>압축 파일(.zip)</b></td></tr>
+          <tr><td>하는 일</td><td>PATH 등록 · <span class="mono">py</span> 런처 · 레지스트리</td><td><b>압축 해제가 끝</b> — 아무것도 등록 안 함</td></tr>
+          <tr><td>실행</td><td>어디서든 <span class="mono">python</span>, <span class="mono">py</span></td><td>폴더 안 <span class="mono">python.exe</span>를 <b>경로로 직접</b></td></tr>
+          <tr><td>용도</td><td>개발 환경</td><td>앱에 파이썬 <b>동봉</b> 배포 · 격리 실행</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px; font-size:14px">이 PC에서 <span class="mono">py --list</span>가 되는 건
+        <strong>설치판이 등록해 둔 편의</strong> — 이 실습은 그 도움 없이 바이너리를 직접 다룬다.</p>
+    </div>
+  </section>
+
+  <!-- 실습 01-B 절차 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 01 · 바이너리 직접 실행</div>
+      <h2>받아서, 풀고, 바로 실행</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">PowerShell — embeddable</span></div>
-<pre><span class="com"># ── Windows: embeddable zip — 압축 해제가 곧 끝</span>
-curl.exe -LO https://www.python.org/ftp/python/3.13.0/
-              python-3.13.0-embed-amd64.zip
-Expand-Archive python-*-embed*.zip C:\py-embed
-<span class="com"># PYTHONPATH 무시됨! ._pth 에 경로 추가 후 실행</span>
-Add-Content C:\py-embed\python313._pth <span class="str">"...\src"</span>
-C:\py-embed\python.exe -m rps 바위        <span class="com"># ✅</span>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">PowerShell</span></div>
+<pre>cd $env:TEMP
+curl.exe -L -o pyembed.zip https://www.python.org/
+  ftp/python/3.13.0/python-3.13.0-embed-amd64.zip
+Expand-Archive pyembed.zip C:\py-embed
 
-<span class="com"># ── macOS: 단독 빌드 tar.gz — 같은 개념</span>
-curl -LO github.com/astral-sh/python-build-standalone/
-         releases/…/cpython-3.13.1-…-darwin-install_only.tar.gz
-tar -xzf cpython-*.tar.gz
-PYTHONPATH=src ./python/bin/python3 -m rps 바위</pre>
+C:\py-embed\python.exe --version
+<span class="com"># Python 3.13.0   ← 설치 과정 없이 실행됐다</span>
+
+<span class="com"># macOS는 단독 빌드 tar.gz — 같은 개념</span>
+curl -LO github.com/astral-sh/python-build-standalone/…
+tar -xzf cpython-*.tar.gz &amp;&amp; ./python/bin/python3 -V</pre>
+        </div>
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--rock)"></span>풀린 폴더 안에는</div>
+          <ul class="clean">
+            <li><span class="mono">python.exe</span> — 인터프리터 <strong>본체</strong></li>
+            <li><span class="mono">python313.dll</span> — 인터프리터의 실제 구현</li>
+            <li><span class="mono">python313.zip</span> — <strong>표준 라이브러리 통째</strong>(secrets·enum…)</li>
+            <li><span class="mono">python313._pth</span> — 모듈 탐색 경로 설정 <strong>(다음 장의 주인공)</strong></li>
+            <li><span class="mono">*.pyd</span> — C로 짠 표준 모듈들</li>
+          </ul>
+          <p style="margin-top:10px; font-size:13.5px">→ <strong>폴더 하나로 완결</strong>. 핵심 로직이 표준 라이브러리만 쓰는
+            우리 게임은 이대로 돌 준비가 끝났다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실습 01-C 함정과 정리 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 01 · 바이너리 직접 실행</div>
+      <h2>함정 → 해법 → 교훈</h2>
+      <div class="two-col">
+        <div class="editor">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">실패부터 성공까지</span></div>
+<pre>cd C:\repo\…\rock-paper-scissors-python
+$env:PYTHONPATH = <span class="str">"src"</span>
+C:\py-embed\python.exe -m rps 바위
+<span class="com"># No module named rps        ← 실패!</span>
+
+<span class="com"># ._pth 가 경로를 "잠가서" PYTHONPATH 를 무시한다</span>
+Add-Content C:\py-embed\python313._pth <span class="str">"…\src"</span>
+C:\py-embed\python.exe -m rps 바위
+<span class="com"># 당신: ROCK / 컴퓨터: ROCK -&gt; DRAW   ← 성공 ✅</span>
+
+Remove-Item -Recurse -Force C:\py-embed  <span class="com"># 정리 끝</span></pre>
         </div>
         <div>
           <ul class="clean">
-            <li><span class="mono">python.exe</span> = 폴더 안의 <strong>실행 파일일 뿐</strong>. PATH·레지스트리 등록 없음.</li>
-            <li>표준 라이브러리는 <span class="mono">python313.zip</span> 에 동봉 — <strong>폴더 하나로 완결</strong>.</li>
-            <li><span class="mono">._pth</span> 가 모듈 탐색 경로를 잠근다 — <span class="mono">No module named</span> 오류의 정체.</li>
-            <li>설치판의 <span class="mono">py</span> 런처는 설치기가 <strong>등록해 준 것</strong> — 그게 편의의 정체.</li>
-            <li>macOS엔 embeddable이 없어 <strong>python-build-standalone</strong>(uv가 쓰는 단독 빌드)을 쓴다 — <span class="mono">._pth</span> 잠금이 없어 <span class="mono">PYTHONPATH</span>가 동작.</li>
+            <li>인터프리터가 모듈을 찾는 경로(<span class="mono">sys.path</span>)는 <strong>설정 가능한 목록</strong> —
+              <span class="mono">No module named</span> 오류의 정체가 이 목록 문제다.</li>
+            <li>설치판은 <span class="mono">PYTHONPATH</span>·site-packages로, embeddable은 <span class="mono">._pth</span>로
+              그 목록을 관리한다(격리가 목적이라 잠금).</li>
+            <li>macOS 단독 빌드는 잠금이 없어 <span class="mono">PYTHONPATH=src</span>가 그대로 동작.</li>
+            <li>정리 = 폴더 삭제가 끝 — <strong>레지스트리에 아무것도 안 남겼으니까.</strong></li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 30 · Lab 02 -->
+  <!-- 실습 02-A 생성과 활성화 -->
   <section class="slide" id="lab02">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 02 · venv + pip</div>
-      <h2>프로젝트 전용 상자 만들기</h2>
+      <h2>상자를 만들고, 안으로 들어간다</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">PowerShell</span></div>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">생성 → 활성화</span></div>
 <pre><span class="com"># ── Windows (PowerShell)</span>
 py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1     <span class="com"># (.venv) 표시</span>
+.\.venv\Scripts\Activate.ps1
+<span class="com"># "스크립트 실행 불가" 오류가 나면(자주 겪음):</span>
+Set-ExecutionPolicy -Scope Process Bypass
+
 <span class="com"># ── macOS (터미널)</span>
 python3.11 -m venv .venv
 source .venv/bin/activate
 
-<span class="com"># ↓ 여기부터 두 OS 동일</span>
-pip install -e <span class="str">".[dev]"</span>          <span class="com"># pyproject 기반 설치</span>
-pip install -r requirements.txt  <span class="com"># 목록 기반 설치</span>
-pip freeze &gt; requirements-lock.txt  <span class="com"># 버전 스냅샷(고정)</span>
-deactivate</pre>
+(.venv) PS C:\…&gt;   <span class="com"># ← 프롬프트 접두사 = 상자 안</span>
+python --version   <span class="com"># Python 3.11.9 — 상자의 파이썬</span></pre>
+        </div>
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--paper)"></span>.venv 안에 생긴 것</div>
+          <ul class="clean">
+            <li><span class="mono">Scripts/python.exe</span> — 이 상자 <strong>전용 파이썬</strong></li>
+            <li><span class="mono">Scripts/pip.exe</span> — 전용 설치기</li>
+            <li><span class="mono">Lib/site-packages/</span> — <strong>여기에만</strong> 설치됨</li>
+          </ul>
+          <p style="margin-top:10px; font-size:13.5px">프로젝트마다 상자를 따로 → <strong>버전 충돌·오염 방지</strong>.
+            상자는 커밋하지 않는다(각자 만든다). 나갈 땐 <span class="mono">deactivate</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실습 02-B 설치와 스냅샷 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 02 · venv + pip</div>
+      <h2>설치 두 경로, 그리고 스냅샷</h2>
+      <div class="two-col">
+        <div class="editor">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">(.venv) 안에서 — 두 OS 동일</span></div>
+<pre>pip install -e <span class="str">".[dev]"</span>           <span class="com"># ① 정의서(pyproject) 기반</span>
+pip install -r requirements.txt   <span class="com"># ② 목록(requirements) 기반</span>
+
+pytest -q
+<span class="com"># 40 passed ✅</span>
+
+pip freeze &gt; requirements-lock.txt
+<span class="com"># fastapi==0.121.3        ← 전부 == 로 박힌 스냅샷</span>
+<span class="com"># pydantic==2.12.4 …</span>
+
+deactivate                        <span class="com"># 정리는 .venv 폴더 삭제</span></pre>
         </div>
         <div>
           <ul class="clean">
-            <li><strong>가상환경</strong> = 프로젝트별 격리된 파이썬+패키지 폴더. 버전 충돌 방지.</li>
-            <li>프롬프트 앞 <span class="mono">(.venv)</span> = 지금 상자 안이라는 표시.</li>
-            <li><span class="mono">freeze</span> 스냅샷 = 모든 버전을 <span class="mono">==</span>로 <strong>고정(pinning)</strong> — lock의 개념.</li>
-            <li>지울 땐 <span class="mono">.venv</span> 폴더 삭제면 끝.</li>
+            <li><span class="mono">-e</span> = editable — 소스를 고치면 <strong>재설치 없이 바로 반영</strong>.</li>
+            <li>①은 "이 앱은 무엇인가"(레시피), ②는 "정확히 이것들"(장보기) — 16장의 그 구분.</li>
+            <li><span class="mono">freeze</span> 산출물 = 모든 버전 <strong>고정(pinning)</strong> —
+              누가 언제 설치해도 같은 조합, <strong>lock 의 개념</strong>이다.</li>
+            <li>다음 실습: 이 수동 단계들을 <span class="mono">uv</span>가 한 줄로.</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 31 · Lab 03 -->
+  <!-- 실습 03-A 실측 데모 -->
   <section class="slide" id="lab03">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 03 · uv</div>
-      <h2><span class="mono">uv sync</span> 한 방</h2>
+      <h2><span class="mono">uv sync</span> 한 방 — 실측 데모</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">PowerShell</span></div>
-<pre><span class="com"># 설치: winget install astral-sh.uv / brew install uv — 이후 두 OS 동일</span>
-uv sync                    <span class="com"># .venv 생성 + 설치 + uv.lock</span>
-<span class="com"># Resolved 27 packages in 347ms</span>
-
-uv run python -m rps 바위  <span class="com"># 활성화 없이 바로 실행</span>
-uv run pytest -q           <span class="com"># 40 passed</span>
-
-uv sync --extra web        <span class="com"># 선택 의존성(웹)까지</span>
-uv python install 3.12     <span class="com"># 파이썬 버전 설치도 uv로</span></pre>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">이 PC에서 실제 실행한 출력 (클릭 = 다시 재생)</span></div>
+<pre class="term" data-cast="uv"></pre>
         </div>
         <div>
           <ul class="clean">
-            <li>Rust로 만든 <strong>초고속 통합 도구</strong> — 버전·환경·설치·잠금을 하나로.</li>
-            <li>랩 02의 여러 단계가 <span class="mono">uv sync</span> <strong>한 줄</strong>.</li>
-            <li><span class="mono">uv.lock</span> — 하위 의존성까지 자동 잠금(재현성).</li>
-            <li>이 저장소의 <strong>권장 경로</strong>.</li>
+            <li>설치: <span class="mono">winget install astral-sh.uv</span> / <span class="mono">brew install uv</span> —
+              이후 명령은 <strong>두 OS 동일</strong>.</li>
+            <li>한 줄이 랩 02의 <strong>생성+활성화+설치+스냅샷</strong>을 전부 대신한다.</li>
+            <li><span class="mono">uv run</span> = 활성화 없이 그 환경에서 실행.</li>
+            <li>왼쪽 출력은 연출이 아니라 <strong>이 저장소에서 실측한 그대로</strong>다.</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 32 · Lab 04 -->
+  <!-- 실습 03-B 잠금과 관리 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 03 · uv</div>
+      <h2>잠금(uv.lock)과 일상 관리</h2>
+      <div class="two-col">
+        <div class="editor">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">의존성·버전 관리도 uv로</span></div>
+<pre>uv sync --extra web    <span class="com"># 선택 의존성(웹)까지 설치</span>
+uv add requests        <span class="com"># 추가 → pyproject + uv.lock 자동 갱신</span>
+uv remove requests     <span class="com"># 제거도 짝으로</span>
+
+uv python list         <span class="com"># 설치 가능한 파이썬 목록</span>
+uv python install 3.12 <span class="com"># 파이썬 버전 설치도 uv가</span>
+uv venv --python 3.12  <span class="com"># 특정 버전으로 상자 만들기</span></pre>
+        </div>
+        <div>
+          <ul class="clean">
+            <li><span class="mono">uv.lock</span> = 하위 의존성까지 <strong>정확히 잠근 재현 보장</strong> —
+              랩 02의 <span class="mono">pip freeze</span> 스냅샷의 자동판.</li>
+            <li>lock 파일은 <strong>커밋 대상</strong>(팀 전체가 같은 조합).</li>
+            <li>Rust로 만든 통합 도구 — 버전(①)·환경(②)·설치(③)·잠금(④)을 하나로.</li>
+            <li>정리는 여기도 <span class="mono">.venv</span> 삭제가 끝.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실습 04-A 설치와 실행 -->
   <section class="slide" id="lab04">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 04 · poetry</div>
-      <h2>의존성 관리 + 패키징</h2>
+      <h2>의존성 관리 + 패키징 도구</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">PowerShell</span></div>
-<pre>pipx install poetry        <span class="com"># 두 OS 동일 (macOS: brew install pipx 후)</span>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">설치 → 이 저장소 실행</span></div>
+<pre>pipx install poetry   <span class="com"># 공용 CLI는 pipx로 (macOS: brew install pipx 후)</span>
+poetry --version      <span class="com"># Poetry (version 2.x)</span>
 
-poetry install             <span class="com"># 환경 생성 + poetry.lock</span>
-poetry run pytest -q
-poetry add fastapi         <span class="com"># 의존성 추가 + lock 갱신</span>
-<span class="com"># → fastapi = "^0.110"  (캐럿 표기)</span></pre>
+poetry install        <span class="com"># 환경 생성 + 설치 + poetry.lock</span>
+poetry run python -m rps 바위
+poetry run pytest -q  <span class="com"># 40 passed</span></pre>
         </div>
         <div>
           <ul class="clean">
-            <li>uv 이전부터 널리 쓰인 <strong>올인원 도구</strong>. PyPI <strong>배포</strong>까지 아우른다.</li>
-            <li><span class="mono">^1.2.3</span> 캐럿 = <span class="mono">&gt;=1.2.3,&lt;2.0.0</span> (메이저 고정 호환 범위).</li>
-            <li><span class="mono">~1.2.3</span> 틸데 = <span class="mono">&gt;=1.2.3,&lt;1.3.0</span>.</li>
-            <li>표준 <span class="mono">[project]</span> 형식은 Poetry 2.0+가 그대로 읽는다.</li>
+            <li>uv 이전부터 널리 쓰인 <strong>올인원 도구</strong> — 환경(②)·설치(③)·잠금(④)에 더해
+              <strong>빌드·PyPI 배포</strong>(<span class="mono">poetry build/publish</span>)까지.</li>
+            <li><span class="mono">poetry run</span> = <span class="mono">uv run</span>과 같은 개념 — 활성화 없이 실행.</li>
+            <li>표준 <span class="mono">[project]</span> 형식(pyproject)은 Poetry 2.0+가 그대로 읽는다 —
+              이 저장소가 그 예.</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 33 · Lab 05 -->
+  <!-- 실습 04-B 새 프로젝트와 버전 표기 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 04 · poetry</div>
+      <h2>새 프로젝트 흐름, 캐럿과 틸데</h2>
+      <div class="two-col">
+        <div>
+          <div class="editor">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">poetry 방식으로 시작한다면</span></div>
+<pre>poetry new my-app            <span class="com"># 표준 구조 생성</span>
+cd my-app
+poetry add fastapi           <span class="com"># 의존성 추가 + lock 갱신</span>
+<span class="com"># pyproject: fastapi = "^0.110"  ← 캐럿</span>
+poetry add --group dev pytest <span class="com"># 개발용 그룹</span>
+
+pipx uninstall poetry        <span class="com"># 실습 정리</span></pre>
+          </div>
+        </div>
+        <div>
+          <div class="col-label"><span class="tag" style="background:var(--rock)"></span>poetry의 버전 표기 (16장에 이어서)</div>
+          <table class="tbl plain" style="margin-top:6px">
+            <thead><tr><th>표기</th><th>의미</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">^1.2.3</td><td>캐럿 — <span class="mono">&gt;=1.2.3,&lt;2.0.0</span> (메이저 고정 호환)</td></tr>
+              <tr><td class="mono">~1.2.3</td><td>틸데 — <span class="mono">&gt;=1.2.3,&lt;1.3.0</span></td></tr>
+              <tr><td class="mono">1.2.3</td><td>정확히 고정 (<span class="mono">==</span>)</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:13.5px">캐럿이 <span class="mono">poetry add</span>의 기본 —
+            "메이저가 안 바뀌는 선에서 최신"이라는 <strong>범위 전략</strong>이다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실습 05-A 개념 -->
   <section class="slide" id="lab05">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 05 · conda</div>
-      <h2>파이썬 + 네이티브 스택까지</h2>
+      <h2>여러분의 <span class="accent">주력</span>이 될 도구</h2>
+      <p class="lead" style="margin-top:10px">AI/ML 연구 환경에서는 PyTorch·CUDA·MKL 같은 <strong>네이티브 스택</strong> 때문에
+        conda가 사실상 표준 — 연구실에서 <strong>가장 먼저 만나는 도구</strong>다.</p>
+      <table class="tbl plain">
+        <thead><tr><th></th><th>pip / uv</th><th>conda</th></tr></thead>
+        <tbody>
+          <tr><td>다루는 것</td><td>파이썬 패키지</td><td>파이썬 + <b>네이티브</b>(CUDA·MKL·C 라이브러리)</td></tr>
+          <tr><td>패키지 출처</td><td>PyPI</td><td>conda 채널 (conda-forge 등)</td></tr>
+          <tr><td>환경 관리</td><td>폴더(<span class="mono">.venv</span>)</td><td><b>이름</b>(<span class="mono">conda env list</span>)</td></tr>
+          <tr><td>강한 분야</td><td>웹·일반 앱</td><td><b>AI/ML·과학 계산</b></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px; font-size:14px">가위바위보는 일부러 작은 예제 — 여기서 익히는
+        <span class="mono">create → activate → install → remove</span> 흐름이 <strong>그대로 GPU 환경 세팅으로 이어진다.</strong></p>
+    </div>
+  </section>
+
+  <!-- 실습 05-B 절차 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 05 · conda</div>
+      <h2>만들고, 쓰고, 통째로 지우기</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">Anaconda Prompt</span></div>
-<pre><span class="com"># Windows: Anaconda Prompt / macOS: 터미널 — 명령은 동일</span>
-conda create -n rps python=3.11  <span class="com"># 이름으로 환경 관리</span>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">Miniconda 설치 후 — 명령은 두 OS 동일</span></div>
+<pre><span class="com"># Windows: Anaconda Prompt / macOS: 터미널</span>
+conda create -n rps python=3.11  <span class="com"># 이름으로 환경 생성</span>
 conda activate rps               <span class="com"># (rps) 표시</span>
 
 pip install -e .                 <span class="com"># conda 안에서 pip도 OK</span>
 rps 바위
+<span class="com"># 당신: ROCK / 컴퓨터: PAPER -&gt; LOSE</span>
 
+conda env list                   <span class="com"># 내 환경 목록</span>
 conda deactivate
 conda remove -n rps --all        <span class="com"># 통째로 정리</span></pre>
         </div>
         <div>
           <ul class="clean">
-            <li>pip은 <strong>파이썬 패키지</strong>만, conda는 <strong>네이티브 스택</strong>(CUDA·MKL·C 라이브러리)까지.</li>
-            <li>numpy·PyTorch 등 <strong>데이터/ML</strong> 분야에서 선호.</li>
-            <li>폴더(.venv) 대신 <strong>이름</strong>으로 환경을 관리.</li>
-            <li>순수 파이썬 앱에는 과함 — uv/venv가 가볍다.</li>
+            <li>설치는 <strong>Miniconda</strong>(최소판) 권장 — Windows 인스톨러 / macOS pkg 또는
+              <span class="mono">brew install --cask miniconda</span>.</li>
+            <li>원칙: <strong>conda에 있으면 conda로, 없는 것만 pip으로</strong> — 네이티브 의존성 충돌을 줄이는 관례.</li>
+            <li>GPU 세팅도 같은 흐름: <span class="mono">conda create -n torch python=3.11</span> →
+              <span class="mono">conda install pytorch pytorch-cuda …</span></li>
+            <li>이름 기반이라 프로젝트 폴더 밖에서도 환경을 재사용할 수 있다.</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 34 · Lab 06 -->
+  <!-- 실습 06-A 개발 서버 -->
   <section class="slide" id="lab06">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 06 · 웹 서버 배포</div>
-      <h2>uvicorn 개발 · gunicorn 운영</h2>
+      <h2>개발: uvicorn으로 띄우고, 불러본다</h2>
       <div class="two-col">
         <div class="editor">
-          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">개발(Windows) → 운영(리눅스)</span></div>
-<pre><span class="com"># 개발 — Windows·macOS 동일</span>
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">실측 출력 — Windows·macOS 동일</span></div>
+<pre>uv sync --extra web
 uv run uvicorn rps.web:app --reload
-curl <span class="str">"http://127.0.0.1:8000/api/play?h=rock"</span>
-<span class="com"># {"player":"ROCK","computer":"SCISSORS","outcome":"WIN"}</span>
+<span class="com"># INFO: Uvicorn running on http://127.0.0.1:8000</span>
 
-<span class="com"># 운영 — macOS·리눅스는 그대로, Windows는 WSL·Docker</span>
-gunicorn -k uvicorn.workers.UvicornWorker \
-         rps.web:app --workers 4</pre>
+<span class="com"># 다른 터미널에서:</span>
+curl <span class="str">"http://127.0.0.1:8000/api/play?h=rock"</span>
+<span class="com"># {"player":"ROCK","computer":"ROCK","outcome":"DRAW"}</span>
+curl <span class="str">"…/api/play?h=lizard"</span>
+<span class="com"># 400 {"detail":"알 수 없는 손 입력: 'lizard'"}</span></pre>
         </div>
         <div>
           <ul class="clean">
-            <li>Python 웹은 <strong>프레임워크(FastAPI)와 서버(uvicorn/gunicorn)를 분리</strong>해 조합한다.</li>
-            <li>gunicorn은 <strong>유닉스용</strong> — macOS·리눅스에선 그대로 돌고, Windows에선 <strong>WSL·Docker</strong>로.</li>
-            <li>Windows 로컬 개발은 uvicorn이면 충분(<span class="mono">--workers</span>도 가능).</li>
-            <li><span class="mono">/docs</span> 열면 FastAPI 자동 문서(Swagger).</li>
+            <li><span class="mono">rps.web:app</span> = "<span class="mono">rps/web.py</span>의 <span class="mono">app</span> 객체를 띄워라".</li>
+            <li><strong>프레임워크(FastAPI) ≠ 서버(uvicorn)</strong> — 분리해 조합하는 게 파이썬 웹 문화
+              (Spring은 내장 Tomcat이 안에 숨어 있던 것).</li>
+            <li><span class="mono">--reload</span> = 코드 고치면 자동 재시작.</li>
+            <li>브라우저로 <span class="mono">/docs</span> 열면 <strong>자동 문서(Swagger)</strong> — Pydantic 모델 덕.</li>
+            <li>종료는 서버 터미널에서 Ctrl+C.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실습 06-B 운영 서버 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>실습 06 · 웹 서버 배포</div>
+      <h2>운영: gunicorn — 어디서 돌리나</h2>
+      <div class="two-col">
+        <div class="editor">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">macOS·리눅스는 그대로 / Windows는 WSL·Docker</span></div>
+<pre><span class="com"># macOS·리눅스 — 워커 4개로 바로</span>
+gunicorn -k uvicorn.workers.UvicornWorker \
+         rps.web:app --workers 4
+
+<span class="com"># Windows에서 직접 실행하면? (실측)</span>
+<span class="com"># ModuleNotFoundError: No module named 'fcntl'</span>
+<span class="com"># → 유닉스 전용 모듈. WSL 또는 Docker로:</span>
+FROM python:3.13-slim
+RUN pip install -e <span class="str">".[web]"</span>
+CMD [<span class="str">"gunicorn"</span>,<span class="str">"-k"</span>,<span class="str">"uvicorn.workers.UvicornWorker"</span>,
+     <span class="str">"rps.web:app"</span>,<span class="str">"--bind"</span>,<span class="str">"0.0.0.0:8000"</span>]</pre>
+        </div>
+        <div>
+          <ul class="clean">
+            <li>운영은 <strong>워커 여러 개</strong> = 동시 처리↑ + 한 워커가 죽어도 서비스 유지(장애 격리).</li>
+            <li>gunicorn은 <strong>유닉스용</strong> — 01장 "같은 코드도 OS에 따라 다르다"의 실전 사례.</li>
+            <li>실제 배포는 대개 <strong>리눅스 컨테이너</strong> — 그래서 개발도 WSL·Docker로 맞추는 흐름.</li>
+            <li>Windows 로컬 개발은 uvicorn(<span class="mono">--workers</span> 가능)으로 충분.</li>
           </ul>
         </div>
       </div>
@@ -1407,16 +1616,12 @@ gunicorn -k uvicorn.workers.UvicornWorker \
         그 논리를 읽는 눈을 기른다.</p>
       <div class="editor" style="margin-top:22px; max-width:640px">
         <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">지금 실행해 보기</span></div>
-<pre><span class="com"># uv 하나로 환경 + 실행</span>
+<pre>git clone https://github.com/yscha88/rock-paper-scissors-python
+cd rock-paper-scissors-python
 uv sync
 uv run python -m rps 바위
 <span class="com"># → 당신: ROCK / 컴퓨터: SCISSORS -> WIN</span></pre>
       </div>
-      <p style="margin-top:20px; font-size:14px" class="mono">이 슬라이드는 강의용 요약 —
-        깊이는 docs/ 문서 4편, 직접 해보는 절차는 docs/labs/ 랩 6종에.<br>
-        시리즈 — java·api·docker: github.com/yscha88/rock-paper-scissors<br>
-        c++·cli: github.com/yscha88/rock-paper-scissors-cpp ·
-        <b>python·예제: github.com/yscha88/rock-paper-scissors-python</b></p>
     </div>
   </section>
 

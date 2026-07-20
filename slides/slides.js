@@ -58,6 +58,73 @@
   });
   chapnav.addEventListener('mouseleave', function(){ drop.classList.remove('show'); });
 
+  // ── 터미널 캐스트: 실측 출력을 자동 타이핑으로 재생 ──
+  // ["cmd", ...] = 프롬프트+타이핑 / ["out", ...] = 출력 / ["ok", ...] = 강조 출력
+  var CASTS = {
+    uv: [
+      ["cmd", "uv sync"],
+      ["out", "Using CPython 3.13.0"],
+      ["out", "Creating virtual environment at: .venv"],
+      ["out", "Resolved 27 packages in 347ms"],
+      ["out", "Installed 1 package in 140ms"],
+      ["out", " + rock-paper-scissors-python==0.1.0"],
+      ["cmd", "uv run python -m rps 바위"],
+      ["ok",  "당신: ROCK / 컴퓨터: SCISSORS -> WIN"],
+      ["cmd", "uv run pytest -q"],
+      ["ok",  "40 passed in 0.06s"]
+    ]
+  };
+  var termTimers = [];
+  function termLine(kind, text){
+    var div = document.createElement('div');
+    div.className = 'tl ' + kind;
+    if(kind === 'cmd'){
+      div.innerHTML = '<span class="p">$</span> <span class="t"></span>';
+      div.querySelector('.t').textContent = text;
+    } else {
+      div.textContent = text;
+    }
+    return div;
+  }
+  function playTerm(slide){
+    termTimers.forEach(clearTimeout); termTimers = [];
+    var term = slide && slide.querySelector('.term[data-cast]');
+    if(!term) return;
+    var cast = CASTS[term.getAttribute('data-cast')];
+    if(!cast) return;
+    term.innerHTML = '';
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      cast.forEach(function(l){ term.appendChild(termLine(l[0], l[1])); });
+      return;
+    }
+    var t = 400;
+    cast.forEach(function(l){
+      if(l[0] === 'cmd'){
+        var el = termLine('cmd', '');
+        (function(el){ termTimers.push(setTimeout(function(){ term.appendChild(el); }, t)); })(el);
+        var chars = l[1];
+        for(var j = 1; j <= chars.length; j++){
+          (function(el, j){
+            termTimers.push(setTimeout(function(){
+              el.querySelector('.t').textContent = chars.slice(0, j);
+            }, t + j * 38));
+          })(el, j);
+        }
+        t += chars.length * 38 + 550;
+      } else {
+        (function(l){ termTimers.push(setTimeout(function(){ term.appendChild(termLine(l[0], l[1])); }, t)); })(l);
+        t += 190;
+      }
+    });
+  }
+  // 캐스트 클릭 = 다시 재생
+  document.querySelectorAll('.term[data-cast]').forEach(function(term){
+    term.addEventListener('click', function(){
+      var s = term.closest('.slide');
+      if(s) playTerm(s);
+    });
+  });
+
   function render(){
     slides.forEach(function(s, idx){ s.classList.toggle('active', idx===i); });
     dots.forEach(function(d, idx){ d.classList.toggle('on', idx===i); });
@@ -67,6 +134,7 @@
     var cur = -1;
     chapStarts.forEach(function(s, k){ if(s >= 0 && s <= i) cur = k; });
     chapBtns.forEach(function(b, k){ b.classList.toggle('on', k === cur); });
+    playTerm(slides[i]);   // 슬라이드에 캐스트가 있으면 자동 재생
   }
   function go(n){ i = Math.max(0, Math.min(total-1, n)); render(); }
   function next(){ go(i+1); }

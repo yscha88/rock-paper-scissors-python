@@ -97,7 +97,8 @@ conda activate rps
 conda install numpy                  # 파이썬+네이티브 패키지를 함께
 ```
 > **pip vs conda**: pip 은 "파이썬 패키지"를, conda 는 "파이썬 + 그 밑의 네이티브 스택"을 다룹니다.
-> 웹/일반 앱은 pip·uv 로 충분하고, 과학 스택 호환성이 중요하면 conda 가 편합니다.
+> 웹/일반 앱은 pip·uv 로 충분하고, **AI/ML 연구 환경(PyTorch·CUDA)에서는 conda 가 사실상
+> 표준**입니다 — 연구실에서 가장 먼저 만나게 될 도구입니다(→ [랩 05](labs/05-conda.md)).
 
 ### pyenv — 파이썬 **버전** 전환 전담 (①)
 여러 파이썬 버전을 깔아 두고 프로젝트별로 고른다. `.python-version` 파일로 버전을 지정한다
