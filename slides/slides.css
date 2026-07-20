@@ -236,3 +236,27 @@ ul.clean li strong{color:var(--ink)}
 
 /* ---------- 마지막 열 초록 강조를 끄는 표 ---------- */
 .tbl.plain tr td:last-child{color:inherit; font-weight:inherit; font-family:inherit}
+
+/* ---------- 챕터 내비 (상단 중앙) ---------- */
+.chapnav{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:40;
+  display:flex; gap:4px; background:var(--panel); border:1px solid var(--hair);
+  border-radius:999px; padding:4px; box-shadow:var(--shadow)}
+.chapnav button{font-family:var(--mono); font-size:12px; padding:6px 12px; border:none;
+  border-radius:999px; background:transparent; color:var(--muted); cursor:pointer;
+  transition:background .2s, color .2s; white-space:nowrap}
+.chapnav button:hover{color:var(--ink); background:var(--panel-2)}
+.chapnav button.on{background:var(--accent); color:#fff}
+.chapnav button:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 55%, transparent); outline-offset:1px}
+@media (max-width:900px){.chapnav{display:none}}
+
+/* 챕터 드롭다운 — 호버하면 그 챕터의 슬라이드(섹션) 목록 */
+.chapdrop{position:absolute; top:100%; left:0; display:none; flex-direction:column;
+  min-width:250px; max-width:360px; max-height:62vh; overflow-y:auto;
+  background:var(--panel); border:1px solid var(--hair); border-radius:12px;
+  padding:6px; box-shadow:var(--shadow)}
+.chapdrop.show{display:flex}
+.chapdrop button{font-family:var(--sans); font-size:12.5px; text-align:left; padding:7px 10px;
+  border:none; background:transparent; color:var(--muted); border-radius:8px; cursor:pointer;
+  white-space:normal; line-height:1.4}
+.chapdrop button:hover{background:var(--panel-2); color:var(--ink)}
+.chapdrop button.cur{color:var(--accent); font-weight:700}

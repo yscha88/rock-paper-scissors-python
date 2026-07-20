@@ -11,18 +11,27 @@
 <div class="progress" id="progress"></div>
 <div class="chrome brand">rock-paper-scissors · <b>python</b></div>
 <div class="chrome theme-btn"><button id="themeBtn" aria-label="테마 전환" title="테마 전환">◐</button></div>
+<nav class="chapnav" id="chapnav" aria-label="챕터 이동">
+  <button data-goto="#intro">개요</button>
+  <button data-goto="#sec01">01 기초</button>
+  <button data-goto="#sec02">02 환경</button>
+  <button data-goto="#sec03">03 문법</button>
+  <button data-goto="#sec04">04 비교</button>
+  <button data-goto="#seclabs">실습</button>
+  <button data-goto="#secend">끝</button>
+</nav>
 <div class="dots" id="dots" aria-hidden="true"></div>
 <div class="chrome counter"><b id="cur">1</b> / <span id="total">44</span></div>
 <div class="chrome nav">
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
 </div>
-<div class="hint">이동: <span class="kbd">←</span> <span class="kbd">→</span> <span class="kbd">Space</span></div>
+<div class="hint">이동: <span class="kbd">←</span> <span class="kbd">→</span> <span class="kbd">Space</span> · 챕터: <span class="kbd">1</span>~<span class="kbd">7</span></div>
 
 <main class="deck" id="deck">
 
   <!-- 1 · Title -->
-  <section class="slide active">
+  <section class="slide active" id="intro">
     <div class="stage">
       <div class="hands" aria-hidden="true"><span>✊</span><span>✋</span><span>✌️</span></div>
       <div class="eyebrow"><span class="tick"></span>강의 개요</div>
@@ -1180,7 +1189,7 @@ _game = RockPaperScissors()
   <!-- ══════════ 실습 · Labs ══════════ -->
 
   <!-- 28 · Labs overview -->
-  <section class="slide">
+  <section class="slide" id="seclabs">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>실습 · Labs</div>
       <h2>손으로 직접 — 실습 랩 <span class="accent">6종</span></h2>
@@ -1388,7 +1397,7 @@ gunicorn -k uvicorn.workers.UvicornWorker \
   </section>
 
   <!-- 35 · closing -->
-  <section class="slide">
+  <section class="slide" id="secend">
     <div class="stage" style="text-align:left">
       <div class="hands" aria-hidden="true" style="font-size:clamp(32px,6vw,60px)"><span>✊</span><span>✋</span><span>✌️</span></div>
       <div class="eyebrow"><span class="tick"></span>마무리</div>
@@ -1403,7 +1412,11 @@ uv sync
 uv run python -m rps 바위
 <span class="com"># → 당신: ROCK / 컴퓨터: SCISSORS -> WIN</span></pre>
       </div>
-      <p style="margin-top:20px; font-size:14px" class="mono">docs/ 문서 4편 + docs/labs/ 실습 6종으로 이어서.</p>
+      <p style="margin-top:20px; font-size:14px" class="mono">이 슬라이드는 강의용 요약 —
+        깊이는 docs/ 문서 4편, 직접 해보는 절차는 docs/labs/ 랩 6종에.<br>
+        시리즈 — java·api·docker: github.com/yscha88/rock-paper-scissors<br>
+        c++·cli: github.com/yscha88/rock-paper-scissors-cpp ·
+        <b>python·예제: github.com/yscha88/rock-paper-scissors-python</b></p>
     </div>
   </section>
 

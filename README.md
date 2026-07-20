@@ -3,9 +3,10 @@
 같은 가위바위보를 **Java(Spring Boot)** → **C++20** → **Python** 순서로 만들어 보면서,
 Python 이 얼마나 짧고 간단하게 같은 일을 해내는지 눈으로 확인하는 **교육용 저장소**입니다.
 
-- 원본: [`../rock-paper-scissors`](../rock-paper-scissors) — Java 17 + Spring Boot REST API
-- 이식: [`../rock-paper-scissors-cpp`](../rock-paper-scissors-cpp) — C++20 (핵심 로직 + CLI)
-- **이 repo**: 세 번째 이식판. 같은 도메인/판정 로직을 Python 으로.
+- 원본: [rock-paper-scissors](https://github.com/yscha88/rock-paper-scissors) — Java 17 + Spring Boot REST API (api · docker)
+- 이식: [rock-paper-scissors-cpp](https://github.com/yscha88/rock-paper-scissors-cpp) — C++20 핵심 로직 + CLI
+- **이 repo**: [rock-paper-scissors-python](https://github.com/yscha88/rock-paper-scissors-python) —
+  세 번째 이식판. 같은 도메인/판정 로직을 Python 으로, **"진짜 만들어 보기" 예제용**.
 
 세 구현의 **판정 공식은 완전히 동일**합니다 — `diff = (player - computer + 3) % 3`.
 달라지는 것은 "그 로직을 감싸는 언어의 무게"입니다.

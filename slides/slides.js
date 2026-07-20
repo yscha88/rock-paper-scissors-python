@@ -18,11 +18,55 @@
   });
   var dots = Array.prototype.slice.call(dotsWrap.children);
 
+  // 챕터 내비: 각 버튼이 가리키는 슬라이드 인덱스를 미리 계산
+  var chapBtns = Array.prototype.slice.call(document.querySelectorAll('#chapnav [data-goto]'));
+  var chapStarts = chapBtns.map(function(b){
+    return slides.indexOf(document.querySelector(b.getAttribute('data-goto')));
+  });
+
+  // 챕터 드롭다운: 버튼 호버 → 그 챕터의 슬라이드(섹션) 목록을 보여 주고 클릭으로 점프
+  var chapnav = document.getElementById('chapnav');
+  var drop = document.createElement('div');
+  drop.className = 'chapdrop';
+  chapnav.appendChild(drop);
+  function slideTitle(s){
+    var h = s.querySelector('h2') || s.querySelector('h1');
+    return h ? h.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+  chapBtns.forEach(function(b, k){
+    b.addEventListener('mouseenter', function(){
+      var start = chapStarts[k];
+      if(start < 0) return;
+      var end = total - 1;
+      for(var m = k + 1; m < chapStarts.length; m++){
+        if(chapStarts[m] >= 0){ end = chapStarts[m] - 1; break; }
+      }
+      drop.innerHTML = '';
+      for(var s = start; s <= end; s++){
+        (function(s){
+          var it = document.createElement('button');
+          it.type = 'button';
+          it.textContent = (s + 1) + '. ' + slideTitle(slides[s]);
+          if(s === i) it.classList.add('cur');
+          it.addEventListener('click', function(){ go(s); drop.classList.remove('show'); });
+          drop.appendChild(it);
+        })(s);
+      }
+      drop.style.left = b.offsetLeft + 'px';
+      drop.classList.add('show');
+    });
+  });
+  chapnav.addEventListener('mouseleave', function(){ drop.classList.remove('show'); });
+
   function render(){
     slides.forEach(function(s, idx){ s.classList.toggle('active', idx===i); });
     dots.forEach(function(d, idx){ d.classList.toggle('on', idx===i); });
     curEl.textContent = i+1;
     progress.style.width = ((i)/(total-1)*100) + '%';
+    // 현재 챕터 하이라이트: 시작 인덱스가 i 이하인 마지막 챕터
+    var cur = -1;
+    chapStarts.forEach(function(s, k){ if(s >= 0 && s <= i) cur = k; });
+    chapBtns.forEach(function(b, k){ b.classList.toggle('on', k === cur); });
   }
   function go(n){ i = Math.max(0, Math.min(total-1, n)); render(); }
   function next(){ go(i+1); }
@@ -34,6 +78,10 @@
     if(e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown'){ e.preventDefault(); next(); }
     else if(e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); prev(); }
     else if(e.key==='Home'){ go(0); } else if(e.key==='End'){ go(total-1); }
+    else if(e.key >= '1' && e.key <= '9'){           // 숫자키 = 챕터 점프
+      var k = Number(e.key) - 1;
+      if(chapStarts[k] !== undefined && chapStarts[k] >= 0) go(chapStarts[k]);
+    }
   });
 
   // 터치 스와이프
