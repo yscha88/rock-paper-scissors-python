@@ -21,7 +21,7 @@
   <button data-goto="#secend">끝</button>
 </nav>
 <div class="dots" id="dots" aria-hidden="true"></div>
-<div class="chrome counter"><b id="cur">1</b> / <span id="total">51</span></div>
+<div class="chrome counter"><b id="cur">1</b> / <span id="total">52</span></div>
 <div class="chrome nav">
   <button id="prev" aria-label="이전 슬라이드">‹</button>
   <button id="next" aria-label="다음 슬라이드">›</button>
@@ -757,40 +757,85 @@ s1.__dict__   <span class="com"># {'age': 20, 'gpa': 3.8}</span>
     </div>
   </section>
 
-  <!-- 03 · 던더와 상속 -->
+  <!-- 03 · 던더 -->
   <section class="slide">
     <div class="stage">
       <div class="eyebrow"><span class="tick"></span>03 · 클래스 심화</div>
-      <h2>자주 쓰는 <span class="mono">__던더__</span>, 그리고 상속</h2>
-      <div class="two-col">
+      <h2>자주 쓰는 <span class="mono">__던더__</span> — 파이썬이 약속한 이름들</h2>
+      <p class="lead" style="margin-top:8px">내가 직접 부르는 게 아니라, <strong>정해진 상황에서 파이썬이 대신 불러 준다.</strong></p>
+      <div class="two-col" style="margin-top:12px">
         <div>
-          <div class="col-label"><span class="tag" style="background:var(--rock)"></span>파이썬이 "약속한 이름"들 — 대신 불러 준다</div>
-          <table class="tbl plain" style="margin-top:6px; font-size:13.5px">
-            <thead><tr><th>던더</th><th>언제</th></tr></thead>
+          <table class="tbl plain" style="margin-top:0; font-size:13px">
+            <thead><tr><th>던더</th><th>언제 불리나 · 이 repo에서</th></tr></thead>
             <tbody>
-              <tr><td class="mono">__init__</td><td>인스턴스 생성 시</td></tr>
-              <tr><td class="mono">__repr__ · __eq__</td><td>출력·<span class="mono">==</span> (dataclass가 자동 생성)</td></tr>
+              <tr><td class="mono">__init__</td><td>인스턴스 생성 시 — <span class="mono">RockPaperScissors</span></td></tr>
+              <tr><td class="mono">__repr__</td><td>디버깅 출력·REPL — dataclass가 자동 생성</td></tr>
+              <tr><td class="mono">__eq__</td><td><span class="mono">a == b</span> — dataclass 자동, 테스트에서 사용</td></tr>
+              <tr><td class="mono">__str__</td><td><span class="mono">print(obj)</span> — 없으면 <span class="mono">__repr__</span>로 대체</td></tr>
+              <tr><td class="mono">__len__</td><td><span class="mono">len(obj)</span></td></tr>
+              <tr><td class="mono">__iter__</td><td><span class="mono">for x in obj</span></td></tr>
               <tr><td class="mono">__getitem__</td><td><span class="mono">obj[i]</span> — 판정식의 튜플 인덱싱이 이것</td></tr>
-              <tr><td class="mono">__enter__/__exit__</td><td><span class="mono">with</span> 진입/퇴장 — <b>예외가 터져도 정리 보장</b></td></tr>
-              <tr><td class="mono">__main__</td><td>메서드 아님! <b>예약된 모듈 이름</b> — <span class="mono">python -m rps</span>가 실행하는 <span class="mono">__main__.py</span></td></tr>
+              <tr><td class="mono">__call__</td><td><span class="mono">obj()</span> — 인스턴스를 함수처럼</td></tr>
             </tbody>
           </table>
         </div>
         <div>
-          <div class="col-label"><span class="tag" style="background:var(--paper)"></span>상속 — 사실 이미 쓰고 있었다</div>
           <div class="editor">
-            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">grad.py</span></div>
-<pre><span class="kw">class</span> <span class="fn">GradStudent</span>(Student):   <span class="com"># Student를 물려받고</span>
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">__enter__ / __exit__ — with의 짝</span></div>
+<pre><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"scores.txt"</span>) <span class="kw">as</span> f:  <span class="com"># 진입: __enter__</span>
+    data = f.read()
+<span class="com"># 퇴장: __exit__ — 블록에서 예외가 터져도</span>
+<span class="com">#       파일은 반드시 닫힌다 (예외 처리 장과 연결)</span></pre>
+          </div>
+          <div class="editor" style="margin-top:12px">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">__main__ — 메서드가 아니라 "예약된 모듈 이름"</span></div>
+<pre>python -m rps            <span class="com"># → rps/__main__.py 실행</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:  <span class="com"># 직접 실행일 때만</span>
+    main()                   <span class="com"># (임포트 시엔 안 돔)</span></pre>
+          </div>
+          <p style="margin-top:10px; font-size:13.5px">던더 규약은 메서드만이 아니라 <strong>모듈·변수에도</strong> —
+            <span class="mono">__name__</span>·<span class="mono">__file__</span>·<span class="mono">__dict__</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · 상속 -->
+  <section class="slide">
+    <div class="stage">
+      <div class="eyebrow"><span class="tick"></span>03 · 클래스 심화</div>
+      <h2>상속 — 사실 이미 쓰고 있었다</h2>
+      <div class="two-col">
+        <div>
+          <div class="editor">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">grad.py — 슬라이드 2의 대학원생으로</span></div>
+<pre><span class="kw">class</span> <span class="fn">Student</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name): self.name = name
+    <span class="kw">def</span> <span class="fn">daily</span>(self): <span class="fn">eat</span>(); <span class="fn">sleep</span>()
+
+<span class="kw">class</span> <span class="fn">GradStudent</span>(Student):   <span class="com"># ① 물려받고</span>
     <span class="kw">def</span> <span class="fn">__init__</span>(self, name, lab):
-        <span class="fn">super</span>().__init__(name)  <span class="com"># 부모 것 먼저</span>
-        self.lab = lab          <span class="com"># 내 것 추가</span>
-    <span class="kw">def</span> <span class="fn">daily</span>(self):            <span class="com"># 오버라이드</span>
+        <span class="fn">super</span>().__init__(name)  <span class="com"># ② 부모 것 먼저</span>
+        self.lab = lab          <span class="com"># ③ 내 것 추가</span>
+    <span class="kw">def</span> <span class="fn">daily</span>(self):            <span class="com"># ④ 오버라이드</span>
         <span class="fn">super</span>().daily()
         <span class="fn">research</span>(); <span class="fn">repeat</span>()</pre>
           </div>
-          <ul class="clean" style="margin-top:10px">
-            <li><span class="mono">Hand(IntEnum)</span>·<span class="mono">PlayResponse(BaseModel)</span> — 전부 <strong>상속</strong>. "부모의 능력을 물려받기".</li>
-            <li>C++/Java식 "교체 지점용 상속"(<span class="mono">RandomSource</span>)은 파이썬에선 <strong>일급 함수로 대체</strong> — 덜 필요하다.</li>
+        </div>
+        <div>
+          <table class="tbl plain" style="margin-top:0; font-size:13.5px">
+            <thead><tr><th>이미 쓴 코드</th><th>정체</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">Hand(IntEnum)</td><td><span class="mono">IntEnum</span> 상속 — 산술·역조회가 공짜인 이유</td></tr>
+              <tr><td class="mono">Outcome(Enum)</td><td><span class="mono">Enum</span> 상속</td></tr>
+              <tr><td class="mono">PlayResponse(BaseModel)</td><td>Pydantic 상속 — 런타임 검증이 공짜인 이유</td></tr>
+            </tbody>
+          </table>
+          <ul class="clean" style="margin-top:12px">
+            <li><span class="mono">super()</span> = 부모 클래스 — 부모의 <span class="mono">__init__</span>/메서드를 이어서 부를 때.</li>
+            <li><strong>오버라이드</strong> = 같은 이름을 내 방식으로 재정의.</li>
+            <li>파이썬 상속의 주 용도는 <strong>"능력 물려받기"</strong> — C++/Java식 "교체 지점용 상속"(<span class="mono">RandomSource</span>)은
+              <strong>일급 함수로 대체</strong>되어 덜 필요하다.</li>
           </ul>
         </div>
       </div>
@@ -1607,18 +1652,23 @@ CMD [<span class="str">"gunicorn"</span>,<span class="str">"-k"</span>,<span cla
     <div class="stage" style="text-align:left">
       <div class="hands" aria-hidden="true" style="font-size:clamp(32px,6vw,60px)"><span>✊</span><span>✋</span><span>✌️</span></div>
       <div class="eyebrow"><span class="tick"></span>마무리</div>
-      <h2>코드를 이해하면 <span class="accent">버그가 보인다</span></h2>
-      <p class="lead" style="margin-top:14px; max-width:60ch">3번 슬라이드의 <span class="mono">age++</span>처럼,
-        진짜 버그는 문법이 아니라 <strong>논리</strong>에 숨는다. 가위바위보를 세 언어로 만들며
-        그 논리를 읽는 눈을 기른다.</p>
-      <div class="editor" style="margin-top:22px; max-width:640px">
-        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">지금 실행해 보기</span></div>
+      <h2>이제, <span class="accent">직접 만들</span> 차례</h2>
+      <p class="lead" style="margin-top:14px; max-width:62ch">같은 판정식
+        <span class="mono">(player − computer + 3) % 3</span> 이 언어마다 다른 무게를 입는 것을 봤다 —
+        Java의 계층, C++의 소유권, 그리고 Python의 <strong>한 파일</strong>.
+        이 저장소는 그 차이를 손으로 확인하는 <strong>"진짜 만들어 보기" 예제</strong>다.</p>
+      <div class="editor" style="margin-top:20px; max-width:640px">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name mono">지금 시작</span></div>
 <pre>git clone https://github.com/yscha88/rock-paper-scissors-python
 cd rock-paper-scissors-python
 uv sync
 uv run python -m rps 바위
 <span class="com"># → 당신: ROCK / 컴퓨터: SCISSORS -> WIN</span></pre>
       </div>
+      <p style="margin-top:18px; font-size:14.5px"><strong>이어서 해볼 것</strong> —
+        ① <span class="mono">_ALIASES</span>에 새 언어 별칭 추가 →
+        ② <span class="mono">uv run pytest</span>로 테스트가 여전히 통과하는지 →
+        ③ <span class="mono">rps.web</span>을 띄워 API로도. <strong>고치고 확인하는 것까지가 실습이다.</strong></p>
     </div>
   </section>
 
