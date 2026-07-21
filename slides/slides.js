@@ -34,7 +34,7 @@
     return h ? h.textContent.replace(/\s+/g, ' ').trim() : '';
   }
   chapBtns.forEach(function(b, k){
-    b.addEventListener('mouseenter', function(){
+    function showDrop(){
       var start = chapStarts[k];
       if(start < 0) return;
       var end = total - 1;
@@ -54,9 +54,14 @@
       }
       drop.style.left = b.offsetLeft + 'px';
       drop.classList.add('show');
-    });
+    }
+    b.addEventListener('mouseenter', showDrop);
+    b.addEventListener('focus', showDrop);       // 키보드 접근성: 탭 포커스로도 열림
   });
   chapnav.addEventListener('mouseleave', function(){ drop.classList.remove('show'); });
+  chapnav.addEventListener('keydown', function(e){  // Esc 로 닫기
+    if(e.key === 'Escape') drop.classList.remove('show');
+  });
 
   // ── 터미널 캐스트: 실측 출력을 자동 타이핑으로 재생 ──
   // ["cmd", ...] = 프롬프트+타이핑 / ["out", ...] = 출력 / ["ok", ...] = 강조 출력
