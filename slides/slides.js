@@ -203,5 +203,12 @@
     if(nextT) root.setAttribute('data-theme', nextT); else root.removeAttribute('data-theme');
   });
 
+  // 딥링크: index.html#12 → 12번 슬라이드로 시작, #12/dark → 다크 테마 강제
+  var mh = location.hash.match(/^#(\d+)(?:\/(dark|light))?$/);
+  if(mh){
+    i = Math.min(total, Math.max(1, Number(mh[1]))) - 1;
+    if(mh[2]) document.documentElement.setAttribute('data-theme', mh[2]);
+  }
+
   render();
 })();
