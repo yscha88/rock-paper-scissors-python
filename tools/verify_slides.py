@@ -31,6 +31,11 @@ def strip_tags(s: str) -> str:
     return re.sub(r"<[^>]+>", "", s).replace("&amp;", "&").replace("&gt;", ">").replace("&lt;", "<")
 
 
+def norm(s: str) -> str:
+    """포맷터가 넣는 개행·들여쓰기에 흔들리지 않도록 공백을 한 칸으로 정규화한다."""
+    return re.sub(r"\s+", " ", s).strip()
+
+
 def parse_master() -> list[dict]:
     rows = []
     for line in MASTER.read_text(encoding="utf-8").splitlines():
@@ -51,14 +56,14 @@ def parse_slides(html: str) -> list[dict]:
     out = []
     for attrs, body in re.findall(r"<section class=\"slide[^\"]*\"([^>]*)>(.*?)</section>", html, re.S):
         sid = (re.search(r'id="([^"]+)"', attrs) or [None, ""])[1]
-        eb = re.search(r'<div class="eyebrow"><span class="tick"></span>(.*?)</div>', body)
-        h = re.search(r"<h[12]>(.*?)</h[12]>", body, re.S)
+        eb = re.search(r'<div class="eyebrow">(.*?)</div>', body, re.S)
+        h = re.search(r"<h[12][^>]*>(.*?)</h[12]>", body, re.S)
         out.append({
             "id": sid,
-            "eyebrow": strip_tags(eb.group(1)).strip() if eb else "",
-            "h2": strip_tags(h.group(1)).replace("\n", " ").strip() if h else "",
-            "text": strip_tags(body),
-            "raw": body,
+            "eyebrow": norm(strip_tags(eb.group(1))) if eb else "",
+            "h2": norm(strip_tags(h.group(1))) if h else "",
+            "text": norm(strip_tags(body)),
+            "raw": norm(body),
         })
     return out
 
