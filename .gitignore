@@ -16,6 +16,9 @@ build/
 dist/
 *.whl
 
+# pptx 검증 산출물 (tools/verify_pptx.ps1 덤프 — 텍스트 JSON·PNG·왕복 사본)
+tools/_verify/
+
 # uv / poetry 락파일은 앱이면 커밋, 라이브러리면 무시하는 편.
 # 이 교육 repo 는 앱에 가까우므로 락파일을 커밋하려면 아래 줄을 지운다.
 uv.lock
